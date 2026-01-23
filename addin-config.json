@@ -1,0 +1,5 @@
+{
+  "addinName": "ClarionMarkdownEditor",
+  "deploymentFolder": "MarkdownAddin",
+  "deploymentPath": "accessory\\addins\\MarkdownAddin"
+}

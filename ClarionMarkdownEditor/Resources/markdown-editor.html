@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <title>Markdown Editor</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 14px; }
+
+        .container { display: flex; flex-direction: column; height: 100%; background: #f5f5f5; }
+
+        /* Formatting toolbar */
+        .format-toolbar { display: flex; gap: 4px; padding: 4px 8px; background: #e8e8e8; border-bottom: 1px solid #ccc; }
+        .format-toolbar button { padding: 3px 8px; border: 1px solid #aaa; background: #fff; cursor: pointer; font-size: 12px; border-radius: 3px; min-width: 28px; }
+        .format-toolbar button:hover { background: #e0e0e0; }
+        .format-toolbar button:active { background: #d0d0d0; }
+
+        /* Editor area */
+        .editor-container { display: flex; flex: 1; overflow: hidden; }
+
+        /* Editor pane */
+        .editor-pane { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #ccc; }
+        .editor-pane .pane-header { padding: 4px 8px; background: #ddd; font-size: 11px; font-weight: bold; color: #555; }
+        .editor-pane textarea { flex: 1; width: 100%; border: none; resize: none; padding: 10px; font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; line-height: 1.5; outline: none; }
+
+        /* Preview pane */
+        .preview-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .preview-pane .pane-header { padding: 4px 8px; background: #ddd; font-size: 11px; font-weight: bold; color: #555; display: flex; justify-content: space-between; align-items: center; }
+        .preview-pane .pane-header .title { }
+        .preview-pane .pane-header .toggle-btn { padding: 2px 8px; border: 1px solid #aaa; background: #fff; cursor: pointer; font-size: 10px; border-radius: 3px; }
+        .preview-pane .pane-header .toggle-btn:hover { background: #e0e0e0; }
+        .preview-pane .preview-content { flex: 1; padding: 15px; overflow: auto; background: #fff; }
+
+        /* Fullscreen preview mode */
+        .editor-pane.hidden { display: none; }
+        .preview-pane.fullscreen { flex: 1; border-left: none; }
+
+        /* Markdown preview styles */
+        .preview-content h1 { font-size: 1.8em; margin: 0.5em 0; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+        .preview-content h2 { font-size: 1.5em; margin: 0.5em 0; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+        .preview-content h3 { font-size: 1.3em; margin: 0.5em 0; }
+        .preview-content h4, .preview-content h5, .preview-content h6 { font-size: 1.1em; margin: 0.5em 0; }
+        .preview-content p { margin: 0.8em 0; line-height: 1.6; }
+        .preview-content ul, .preview-content ol { margin: 0.8em 0; padding-left: 2em; }
+        .preview-content li { margin: 0.3em 0; }
+        .preview-content code { font-family: 'Consolas', monospace; background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+        .preview-content pre { background: #2d2d2d; color: #ccc; padding: 12px; border-radius: 5px; overflow-x: auto; margin: 1em 0; }
+        .preview-content pre code { background: none; padding: 0; color: inherit; }
+        .preview-content blockquote { border-left: 4px solid #ddd; margin: 1em 0; padding: 0.5em 1em; color: #666; background: #f9f9f9; }
+        .preview-content table { border-collapse: collapse; margin: 1em 0; width: 100%; }
+        .preview-content th, .preview-content td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+        .preview-content th { background: #f5f5f5; font-weight: bold; }
+        .preview-content a { color: #0066cc; }
+        .preview-content img { max-width: 100%; }
+        .preview-content hr { border: none; border-top: 1px solid #ddd; margin: 1.5em 0; }
+
+        /* Syntax highlighting */
+        .hljs-keyword, .hljs-selector-tag { color: #c678dd; }
+        .hljs-string, .hljs-attr { color: #98c379; }
+        .hljs-number { color: #d19a66; }
+        .hljs-comment { color: #5c6370; font-style: italic; }
+        .hljs-function { color: #61afef; }
+        .hljs-title { color: #e5c07b; }
+        .hljs-built_in { color: #56b6c2; }
+
+        /* Status bar */
+        .statusbar { padding: 4px 8px; background: #e0e0e0; border-top: 1px solid #ccc; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="format-toolbar">
+            <button onclick="insertBold()" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button onclick="insertItalic()" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button onclick="insertCode()" title="Inline Code">&lt;/&gt;</button>
+            <button onclick="insertCodeBlock()" title="Code Block">{ }</button>
+            <button onclick="insertLink()" title="Link">Link</button>
+            <button onclick="insertImage()" title="Image">Img</button>
+            <button onclick="insertH1()" title="Heading 1">H1</button>
+            <button onclick="insertH2()" title="Heading 2">H2</button>
+            <button onclick="insertH3()" title="Heading 3">H3</button>
+            <button onclick="insertBulletList()" title="Bullet List">List</button>
+            <button onclick="insertNumberList()" title="Numbered List">1.</button>
+            <button onclick="insertQuote()" title="Blockquote">"</button>
+            <button onclick="insertHr()" title="Horizontal Rule">---</button>
+            <button onclick="insertTable()" title="Table">Table</button>
+        </div>
+
+        <div class="editor-container">
+            <div class="editor-pane">
+                <div class="pane-header">MARKDOWN</div>
+                <textarea id="editor" placeholder="Type your markdown here..." oninput="updatePreview()"></textarea>
+            </div>
+            <div class="preview-pane" id="previewPane">
+                <div class="pane-header">
+                    <span class="title">PREVIEW</span>
+                    <button class="toggle-btn" id="toggleBtn" onclick="toggleFullscreen()" title="Toggle fullscreen preview">Expand</button>
+                </div>
+                <div class="preview-content" id="preview"></div>
+            </div>
+        </div>
+
+        <div class="statusbar">
+            <span id="status">Ready</span>
+            <span id="stats">Lines: 0 | Words: 0</span>
+        </div>
+    </div>
+
+    <script>
+        // Minimal marked.js implementation for markdown parsing
+        var marked = (function() {
+            function escape(html) {
+                return html.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            }
+
+            function parse(src) {
+                var out = '';
+                var lines = src.split('\n');
+                var inCode = false, inList = false, listType = '';
+                var codeBlock = '', codeLanguage = '';
+
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i];
+
+                    // Fenced code blocks
+                    if (line.match(/^```(\w*)/)) {
+                        if (!inCode) {
+                            inCode = true;
+                            codeLanguage = line.replace(/^```/, '').trim();
+                            codeBlock = '';
+                        } else {
+                            out += '<pre><code class="' + (codeLanguage ? 'language-' + codeLanguage : '') + '">' + escape(codeBlock.slice(0,-1)) + '</code></pre>\n';
+                            inCode = false;
+                            codeBlock = '';
+                        }
+                        continue;
+                    }
+                    if (inCode) { codeBlock += line + '\n'; continue; }
+
+                    // Close list if empty line
+                    if (inList && line.trim() === '') {
+                        out += '</' + listType + '>\n';
+                        inList = false;
+                    }
+
+                    // Headers
+                    if (line.match(/^#{1,6}\s/)) {
+                        var level = line.match(/^#+/)[0].length;
+                        var text = line.replace(/^#+\s*/, '');
+                        out += '<h' + level + '>' + inline(text) + '</h' + level + '>\n';
+                        continue;
+                    }
+
+                    // Horizontal rule
+                    if (line.match(/^(-{3,}|\*{3,}|_{3,})$/)) {
+                        out += '<hr>\n';
+                        continue;
+                    }
+
+                    // Blockquote
+                    if (line.match(/^>\s?/)) {
+                        out += '<blockquote>' + inline(line.replace(/^>\s?/, '')) + '</blockquote>\n';
+                        continue;
+                    }
+
+                    // Unordered list
+                    if (line.match(/^[\*\-\+]\s/)) {
+                        if (!inList || listType !== 'ul') {
+                            if (inList) out += '</' + listType + '>\n';
+                            out += '<ul>\n';
+                            inList = true;
+                            listType = 'ul';
+                        }
+                        out += '<li>' + inline(line.replace(/^[\*\-\+]\s/, '')) + '</li>\n';
+                        continue;
+                    }
+
+                    // Ordered list
+                    if (line.match(/^\d+\.\s/)) {
+                        if (!inList || listType !== 'ol') {
+                            if (inList) out += '</' + listType + '>\n';
+                            out += '<ol>\n';
+                            inList = true;
+                            listType = 'ol';
+                        }
+                        out += '<li>' + inline(line.replace(/^\d+\.\s/, '')) + '</li>\n';
+                        continue;
+                    }
+
+                    // Paragraph
+                    if (line.trim() !== '') {
+                        out += '<p>' + inline(line) + '</p>\n';
+                    }
+                }
+
+                if (inCode) out += '<pre><code>' + escape(codeBlock) + '</code></pre>\n';
+                if (inList) out += '</' + listType + '>\n';
+
+                return out;
+            }
+
+            function inline(text) {
+                // Images
+                text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+                // Links
+                text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+                // Bold
+                text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+                // Italic
+                text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+                text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
+                // Inline code
+                text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+                return text;
+            }
+
+            return { parse: parse };
+        })();
+
+        var editor = document.getElementById('editor');
+        var preview = document.getElementById('preview');
+        var statusEl = document.getElementById('status');
+        var statsEl = document.getElementById('stats');
+        var editorPane = document.querySelector('.editor-pane');
+        var previewPane = document.getElementById('previewPane');
+        var toggleBtn = document.getElementById('toggleBtn');
+        var isDirty = false;
+        var isFullscreen = false;
+
+        function toggleFullscreen() {
+            isFullscreen = !isFullscreen;
+            if (isFullscreen) {
+                editorPane.classList.add('hidden');
+                previewPane.classList.add('fullscreen');
+                toggleBtn.textContent = 'Split';
+                toggleBtn.title = 'Show editor and preview side by side';
+            } else {
+                editorPane.classList.remove('hidden');
+                previewPane.classList.remove('fullscreen');
+                toggleBtn.textContent = 'Expand';
+                toggleBtn.title = 'Toggle fullscreen preview';
+            }
+        }
+
+        function updatePreview() {
+            var text = editor.value;
+            preview.innerHTML = marked.parse(text);
+            updateStats();
+            isDirty = true;
+        }
+
+        function updateStats() {
+            var text = editor.value;
+            var lines = text.split('\n').length;
+            var words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            statsEl.textContent = 'Lines: ' + lines + ' | Words: ' + words;
+        }
+
+        function setStatus(msg) {
+            statusEl.textContent = msg;
+            setTimeout(function() { statusEl.textContent = 'Ready'; }, 3000);
+        }
+
+        // Called from C# to get editor content
+        function getEditorContent() {
+            return editor.value;
+        }
+
+        // Called from C# to load content
+        function loadContent(content, filename) {
+            editor.value = content;
+            updatePreview();
+            isDirty = false;
+            setStatus('Opened: ' + filename);
+        }
+
+        // Called from C# for messages
+        function receiveMessage(type, data) {
+            if (type === 'fileSaved') {
+                isDirty = false;
+                setStatus('Saved: ' + data);
+            }
+        }
+
+        // Formatting helpers
+        function insertBold() { wrapSelection('**', '**'); }
+        function insertItalic() { wrapSelection('*', '*'); }
+        function insertCode() { wrapSelection('`', '`'); }
+        function insertCodeBlock() { wrapSelection('\n```\n', '\n```\n'); }
+        function insertH1() { insertAtLineStart('# '); }
+        function insertH2() { insertAtLineStart('## '); }
+        function insertH3() { insertAtLineStart('### '); }
+        function insertBulletList() { insertAtLineStart('- '); }
+        function insertNumberList() { insertAtLineStart('1. '); }
+        function insertQuote() { insertAtLineStart('> '); }
+        function insertHr() { insertText('\n---\n'); }
+
+        function insertLink() {
+            var sel = getSelection();
+            var url = prompt('Enter URL:', 'https://');
+            if (url) {
+                insertText('[' + (sel || 'link text') + '](' + url + ')');
+            }
+        }
+
+        function insertImage() {
+            var url = prompt('Enter image URL:', 'https://');
+            if (url) {
+                var alt = prompt('Enter alt text:', 'image');
+                insertText('![' + (alt || 'image') + '](' + url + ')');
+            }
+        }
+
+        function insertTable() {
+            var table = '\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |\n| Cell 4   | Cell 5   | Cell 6   |\n';
+            insertText(table);
+        }
+
+        function wrapSelection(before, after) {
+            var start = editor.selectionStart;
+            var end = editor.selectionEnd;
+            var text = editor.value;
+            var sel = text.substring(start, end) || 'text';
+            editor.value = text.substring(0, start) + before + sel + after + text.substring(end);
+            editor.selectionStart = start + before.length;
+            editor.selectionEnd = start + before.length + sel.length;
+            editor.focus();
+            updatePreview();
+        }
+
+        function insertAtLineStart(prefix) {
+            var start = editor.selectionStart;
+            var text = editor.value;
+            // Find line start
+            var lineStart = text.lastIndexOf('\n', start - 1) + 1;
+            editor.value = text.substring(0, lineStart) + prefix + text.substring(lineStart);
+            editor.selectionStart = editor.selectionEnd = start + prefix.length;
+            editor.focus();
+            updatePreview();
+        }
+
+        function getSelection() {
+            return editor.value.substring(editor.selectionStart, editor.selectionEnd);
+        }
+
+        function insertText(text) {
+            var start = editor.selectionStart;
+            var end = editor.selectionEnd;
+            var val = editor.value;
+            editor.value = val.substring(0, start) + text + val.substring(end);
+            editor.selectionStart = editor.selectionEnd = start + text.length;
+            editor.focus();
+            updatePreview();
+        }
+
+        // Keyboard shortcuts
+        editor.addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                if (e.key === 'b' || e.key === 'B') { e.preventDefault(); insertBold(); }
+                else if (e.key === 'i' || e.key === 'I') { e.preventDefault(); insertItalic(); }
+            }
+        });
+
+        // Initialize
+        updatePreview();
+    </script>
+</body>
+</html>
