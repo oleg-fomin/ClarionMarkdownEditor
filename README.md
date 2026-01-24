@@ -197,3 +197,16 @@ John Hickey
 
 - Built for the Clarion IDE (SharpDevelop-based)
 - Inspired by popular markdown editors like Typora and Mark Text
+
+```clarion
+     MyProc PROCEDURE
+     CODE
+       MESSAGE('Hello from Clarion!')
+       RETURN
+```
+```javascript
+function test() {
+  console.log('Hello');
+}
+
+```

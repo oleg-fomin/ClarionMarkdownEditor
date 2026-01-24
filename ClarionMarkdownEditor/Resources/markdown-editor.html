@@ -21,20 +21,54 @@
 
         /* Editor pane */
         .editor-pane { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #ccc; }
-        .editor-pane .pane-header { padding: 4px 8px; background: #ddd; font-size: 11px; font-weight: bold; color: #555; }
-        .editor-pane textarea { flex: 1; width: 100%; border: none; resize: none; padding: 10px; font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; line-height: 1.5; outline: none; }
+        .editor-pane .pane-header { 
+            padding: 4px 8px; 
+            background: #ddd; 
+            font-size: 11px; 
+            font-weight: bold; 
+            color: #555; 
+            height: 25px; 
+            display: flex; 
+            align-items: center;
+        }
+        .editor-pane textarea { 
+            flex: 1; 
+            width: 100%; 
+            border: none; 
+            resize: none; 
+            padding: 10px; 
+            font-family: 'Consolas', 'Courier New', monospace; 
+            font-size: 14px; 
+            line-height: 1.5; 
+            outline: none; 
+            white-space: pre; 
+            overflow-x: auto; 
+            overflow-y: auto; 
+            word-wrap: normal;
+        }
 
         /* Preview pane */
         .preview-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .preview-pane .pane-header { padding: 4px 8px; background: #ddd; font-size: 11px; font-weight: bold; color: #555; display: flex; justify-content: space-between; align-items: center; }
+        .preview-pane .pane-header { 
+            padding: 4px 8px; 
+            background: #ddd; 
+            font-size: 11px; 
+            font-weight: bold; 
+            color: #555; 
+            height: 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
         .preview-pane .pane-header .title { }
-        .preview-pane .pane-header .toggle-btn { padding: 2px 8px; border: 1px solid #aaa; background: #fff; cursor: pointer; font-size: 10px; border-radius: 3px; }
+        .preview-pane .pane-header .toggle-btn { padding: 2px 6px; border: 1px solid #aaa; background: #fff; cursor: pointer; font-size: 10px; border-radius: 3px; line-height: 1; }
         .preview-pane .pane-header .toggle-btn:hover { background: #e0e0e0; }
         .preview-pane .preview-content { flex: 1; padding: 15px; overflow: auto; background: #fff; }
 
         /* Fullscreen preview mode */
         .editor-pane.hidden { display: none; }
         .preview-pane.fullscreen { flex: 1; border-left: none; }
+        .format-toolbar.hidden { display: none; }
 
         /* Markdown preview styles */
         .preview-content h1 { font-size: 1.8em; margin: 0.5em 0; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
@@ -66,6 +100,30 @@
 
         /* Status bar */
         .statusbar { padding: 4px 8px; background: #e0e0e0; border-top: 1px solid #ccc; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
+        
+        /* Dark mode */
+        body.dark-mode .container { background: #1e1e1e; }
+        body.dark-mode .format-toolbar { background: #2d2d2d; border-bottom-color: #3e3e3e; }
+        body.dark-mode .format-toolbar button { background: #3e3e3e; border-color: #555; color: #ccc; }
+        body.dark-mode .format-toolbar button:hover { background: #4e4e4e; }
+        body.dark-mode .format-toolbar button:active { background: #5e5e5e; }
+        body.dark-mode .editor-pane { border-right-color: #3e3e3e; }
+        body.dark-mode .editor-pane .pane-header { background: #252525; color: #aaa; }
+        body.dark-mode .editor-pane textarea { background: #1e1e1e; color: #d4d4d4; }
+        body.dark-mode .preview-pane .pane-header { background: #252525; color: #aaa; }
+        body.dark-mode .preview-pane .pane-header label { color: #aaa; }
+        body.dark-mode .preview-pane .pane-header .toggle-btn { background: #3e3e3e; border-color: #555; color: #ccc; }
+        body.dark-mode .preview-pane .pane-header .toggle-btn:hover { background: #4e4e4e; }
+        body.dark-mode .preview-pane .preview-content { background: #1e1e1e; color: #d4d4d4; }
+        body.dark-mode .preview-content h1, body.dark-mode .preview-content h2 { border-bottom-color: #3e3e3e; }
+        body.dark-mode .preview-content code { background: #2d2d2d; color: #d4d4d4; }
+        body.dark-mode .preview-content pre { background: #0d0d0d; color: #d4d4d4; }
+        body.dark-mode .preview-content blockquote { border-left-color: #555; background: #252525; color: #aaa; }
+        body.dark-mode .preview-content table th, body.dark-mode .preview-content table td { border-color: #3e3e3e; }
+        body.dark-mode .preview-content table th { background: #252525; }
+        body.dark-mode .preview-content a { color: #4da6ff; }
+        body.dark-mode .preview-content hr { border-top-color: #3e3e3e; }
+        body.dark-mode .statusbar { background: #252525; border-top-color: #3e3e3e; color: #aaa; }
     </style>
 </head>
 <body>
@@ -95,7 +153,14 @@
             <div class="preview-pane" id="previewPane">
                 <div class="pane-header">
                     <span class="title">PREVIEW</span>
-                    <button class="toggle-btn" id="toggleBtn" onclick="toggleFullscreen()" title="Toggle fullscreen preview">Expand</button>
+                    <div>
+                        <label style="font-size: 10px; font-weight: normal; margin-right: 8px; cursor: pointer;">
+                            <input type="checkbox" id="syncScrollCheckbox" checked onchange="toggleScrollSync()" style="margin-right: 3px; cursor: pointer;">
+                            Sync Scroll
+                        </label>
+                        <button class="toggle-btn" id="darkModeBtn" onclick="toggleDarkMode()" title="Toggle dark mode">🌓 Dark</button>
+                        <button class="toggle-btn" id="toggleBtn" onclick="toggleFullscreen()" title="Toggle fullscreen preview">Expand</button>
+                    </div>
                 </div>
                 <div class="preview-content" id="preview"></div>
             </div>
@@ -226,6 +291,7 @@
         var editorPane = document.querySelector('.editor-pane');
         var previewPane = document.getElementById('previewPane');
         var toggleBtn = document.getElementById('toggleBtn');
+        var formatToolbar = document.querySelector('.format-toolbar');
         var isDirty = false;
         var isFullscreen = false;
 
@@ -234,11 +300,13 @@
             if (isFullscreen) {
                 editorPane.classList.add('hidden');
                 previewPane.classList.add('fullscreen');
+                formatToolbar.classList.add('hidden');
                 toggleBtn.textContent = 'Split';
                 toggleBtn.title = 'Show editor and preview side by side';
             } else {
                 editorPane.classList.remove('hidden');
                 previewPane.classList.remove('fullscreen');
+                formatToolbar.classList.remove('hidden');
                 toggleBtn.textContent = 'Expand';
                 toggleBtn.title = 'Toggle fullscreen preview';
             }
@@ -256,6 +324,82 @@
             var lines = text.split('\n').length;
             var words = text.trim() ? text.trim().split(/\s+/).length : 0;
             statsEl.textContent = 'Lines: ' + lines + ' | Words: ' + words;
+        }
+        
+        // Scroll synchronization
+        var syncingScroll = false;
+        var scrollSyncEnabled = true; // Default enabled
+        
+        function syncScroll(source, target) {
+            if (syncingScroll || !scrollSyncEnabled) return;
+            
+            syncingScroll = true;
+            var percentage = source.scrollTop / (source.scrollHeight - source.clientHeight);
+            if (isNaN(percentage)) percentage = 0;
+            target.scrollTop = percentage * (target.scrollHeight - target.clientHeight);
+            
+            setTimeout(function() {
+                syncingScroll = false;
+            }, 10);
+        }
+        
+        function toggleScrollSync() {
+            var checkbox = document.getElementById('syncScrollCheckbox');
+            scrollSyncEnabled = checkbox.checked;
+            
+            // When enabling sync, align editor to preview's current position
+            if (scrollSyncEnabled) {
+                syncScroll(preview, editor);
+            }
+        }
+        
+        // Sync editor scroll to preview
+        editor.addEventListener('scroll', function() {
+            if (scrollSyncEnabled) {
+                syncScroll(editor, preview);
+            }
+        });
+        
+        // Sync preview scroll to editor
+        preview.addEventListener('scroll', function() {
+            if (scrollSyncEnabled) {
+                syncScroll(preview, editor);
+            }
+        });
+        
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            var isDark = document.body.classList.contains('dark-mode');
+            
+            // Update button text
+            var btn = document.getElementById('darkModeBtn');
+            if (btn) {
+                btn.textContent = isDark ? '☀️ Light' : '🌓 Dark';
+            }
+            
+            // Notify C# (though we're now handling it in JS)
+            if (window.external && window.external.SetDarkMode) {
+                window.external.SetDarkMode(isDark);
+            }
+        }
+        
+        function setDarkMode(enabled) {
+            // Convert string to boolean if needed
+            if (typeof enabled === 'string') {
+                enabled = enabled === 'true';
+            }
+            
+            if (enabled) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            
+            // Update button text
+            var btn = document.getElementById('darkModeBtn');
+            if (btn) {
+                btn.textContent = enabled ? '☀️ Light' : '🌓 Dark';
+            }
         }
 
         function setStatus(msg) {
