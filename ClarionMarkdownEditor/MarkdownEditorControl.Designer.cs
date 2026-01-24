@@ -3,7 +3,7 @@ namespace ClarionMarkdownEditor
     partial class MarkdownEditorControl
     {
         private System.ComponentModel.IContainer components = null;
-        private System.Windows.Forms.WebBrowser webBrowser;
+        private Microsoft.Web.WebView2.WinForms.WebView2 webView;
         private System.Windows.Forms.ToolStrip toolStrip;
         private System.Windows.Forms.ToolStripButton btnNew;
         private System.Windows.Forms.ToolStripButton btnOpen;
@@ -36,7 +36,8 @@ namespace ClarionMarkdownEditor
             this.btnInsertToIDE = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.lblFileName = new System.Windows.Forms.ToolStripLabel();
-            this.webBrowser = new System.Windows.Forms.WebBrowser();
+            this.webView = new Microsoft.Web.WebView2.WinForms.WebView2();
+            ((System.ComponentModel.ISupportInitialize)(this.webView)).BeginInit();
             this.toolStrip.SuspendLayout();
             this.SuspendLayout();
             //
@@ -120,25 +121,23 @@ namespace ClarionMarkdownEditor
             this.lblFileName.Text = "Untitled";
             this.lblFileName.ForeColor = System.Drawing.Color.Gray;
             //
-            // webBrowser
+            // webView
             //
-            this.webBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.webBrowser.Location = new System.Drawing.Point(0, 25);
-            this.webBrowser.MinimumSize = new System.Drawing.Size(20, 20);
-            this.webBrowser.Name = "webBrowser";
-            this.webBrowser.ScriptErrorsSuppressed = true;
-            this.webBrowser.Size = new System.Drawing.Size(600, 375);
-            this.webBrowser.TabIndex = 1;
-            this.webBrowser.IsWebBrowserContextMenuEnabled = false;
+            this.webView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.webView.Location = new System.Drawing.Point(0, 25);
+            this.webView.Name = "webView";
+            this.webView.Size = new System.Drawing.Size(600, 375);
+            this.webView.TabIndex = 1;
             //
             // MarkdownEditorControl
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.webBrowser);
+            this.Controls.Add(this.webView);
             this.Controls.Add(this.toolStrip);
             this.Name = "MarkdownEditorControl";
             this.Size = new System.Drawing.Size(600, 400);
+            ((System.ComponentModel.ISupportInitialize)(this.webView)).EndInit();
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
             this.ResumeLayout(false);

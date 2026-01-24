@@ -172,6 +172,10 @@
         </div>
     </div>
 
+    <!-- INJECT_HIGHLIGHTJS_CSS -->
+    <!-- INJECT_HIGHLIGHTJS_JS -->
+    <!-- INJECT_CLARION_LANG -->
+
     <script>
         // Minimal marked.js implementation for markdown parsing
         var marked = (function() {
@@ -315,6 +319,28 @@
         function updatePreview() {
             var text = editor.value;
             preview.innerHTML = marked.parse(text);
+            
+            // Apply syntax highlighting to all code blocks
+            var statusMsg = 'Ready';
+            if (typeof hljs !== 'undefined') {
+                var blocks = preview.querySelectorAll('pre code');
+                if (blocks.length > 0) {
+                    blocks.forEach(function(block) {
+                        // Remove any existing highlighting
+                        block.removeAttribute('data-highlighted');
+                        try {
+                            hljs.highlightElement(block);
+                            statusMsg = 'Highlighted ' + blocks.length + ' code block(s)';
+                        } catch (err) {
+                            statusMsg = 'Highlight error: ' + err.message;
+                        }
+                    });
+                }
+            } else {
+                statusMsg = 'WARNING: hljs not defined!';
+            }
+            
+            setStatus(statusMsg);
             updateStats();
             isDirty = true;
         }
@@ -415,9 +441,9 @@
         // Called from C# to load content
         function loadContent(content, filename) {
             editor.value = content;
+            setStatus('Loading: ' + filename);
             updatePreview();
-            isDirty = false;
-            setStatus('Opened: ' + filename);
+            // Status will be updated by updatePreview with highlight status
         }
 
         // Called from C# for messages
