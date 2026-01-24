@@ -80,4 +80,10 @@
     <EmbeddedResource Include="Resources\markdown-editor.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  
+  <!-- Copy WebView2Loader.dll to output directory -->
+  <Target Name="CopyWebView2Loader" AfterTargets="Build">
+    <Copy SourceFiles="..\packages\Microsoft.Web.WebView2.1.0.2792.45\runtimes\win-x86\native\WebView2Loader.dll" DestinationFolder="$(OutputPath)" />
+  </Target>
+  
 </Project>

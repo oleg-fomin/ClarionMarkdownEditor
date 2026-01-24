@@ -31,22 +31,28 @@ namespace ClarionMarkdownEditor
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine("=== InitializeWebView START ===");
+                
                 // Check if WebView2 Runtime is available
                 string runtimeVersion = null;
                 try
                 {
                     runtimeVersion = Microsoft.Web.WebView2.Core.CoreWebView2Environment.GetAvailableBrowserVersionString();
+                    System.Diagnostics.Debug.WriteLine($"WebView2 Runtime version: {runtimeVersion}");
                 }
-                catch
+                catch (Exception ex)
                 {
+                    System.Diagnostics.Debug.WriteLine($"WebView2 Runtime check failed: {ex.Message}");
                     // Runtime not found
                     ShowWebView2InstallPrompt();
                     return;
                 }
 
+                System.Diagnostics.Debug.WriteLine("About to call EnsureCoreWebView2Async...");
                 // Initialize WebView2
                 await webView.EnsureCoreWebView2Async(null);
                 _isWebView2Ready = true;
+                System.Diagnostics.Debug.WriteLine("WebView2 initialized successfully!");
                 
                 // Disable context menu entirely
                 webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
@@ -54,29 +60,36 @@ namespace ClarionMarkdownEditor
                 // Load the embedded HTML resource
                 var assembly = Assembly.GetExecutingAssembly();
                 var resourceName = "ClarionMarkdownEditor.Resources.markdown-editor.html";
+                System.Diagnostics.Debug.WriteLine($"Loading resource: {resourceName}");
 
                 using (var stream = assembly.GetManifestResourceStream(resourceName))
                 {
                     if (stream != null)
                     {
+                        System.Diagnostics.Debug.WriteLine($"Resource stream found, length: {stream.Length}");
                         using (var reader = new StreamReader(stream))
                         {
                             string html = reader.ReadToEnd();
+                            System.Diagnostics.Debug.WriteLine($"HTML loaded, length: {html.Length}");
                             
                             // Inject highlight.js from external files
                             html = InjectHighlightJs(html);
+                            System.Diagnostics.Debug.WriteLine($"After injection, HTML length: {html.Length}");
                             
                             webView.NavigateToString(html);
+                            System.Diagnostics.Debug.WriteLine("NavigateToString called");
                         }
                     }
                     else
                     {
+                        System.Diagnostics.Debug.WriteLine("Resource stream is NULL!");
                         webView.NavigateToString(GetFallbackHtml());
                     }
                 }
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"EXCEPTION in InitializeWebView: {ex.ToString()}");
                 MessageBox.Show($"Error initializing WebView2: {ex.Message}\n\nPlease try reinstalling the WebView2 Runtime.", 
                     "WebView2 Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
