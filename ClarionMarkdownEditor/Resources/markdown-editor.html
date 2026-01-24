@@ -204,11 +204,32 @@
         </div>
     </div>
 
+    <!-- Load Marked.js and Mermaid from CDN (virtual host enables this) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
     <!-- INJECT_HIGHLIGHTJS_CSS -->
     <!-- INJECT_HIGHLIGHTJS_JS -->
     <!-- INJECT_CLARION_LANG -->
 
     <script>
+        // Initialize Mermaid
+        if (typeof mermaid !== 'undefined') {
+            mermaid.initialize({ 
+                startOnLoad: false, 
+                theme: 'default',  // 'default' is more colorful than 'dark'
+                themeVariables: {
+                    primaryColor: '#4a90e2',
+                    primaryTextColor: '#fff',
+                    primaryBorderColor: '#2e5c8a',
+                    lineColor: '#6c757d',
+                    secondaryColor: '#82ca9d',
+                    tertiaryColor: '#ffc658'
+                },
+                securityLevel: 'loose'
+            });
+        }
+
         // Minimal marked.js implementation for markdown parsing
         var marked = (function() {
             function escape(html) {
@@ -235,7 +256,12 @@
                             codeBlock = '';
                         } else if (fence === codeFence) {
                             // Only close if same number of backticks
-                            out += '<pre><code class="' + (codeLanguage ? 'language-' + codeLanguage : '') + '">' + escape(codeBlock.slice(0,-1)) + '</code></pre>\n';
+                            // Check for mermaid diagrams
+                            if (codeLanguage === 'mermaid') {
+                                out += '<div class="mermaid">' + escape(codeBlock.slice(0,-1)) + '</div>\n';
+                            } else {
+                                out += '<pre><code class="' + (codeLanguage ? 'language-' + codeLanguage : '') + '">' + escape(codeBlock.slice(0,-1)) + '</code></pre>\n';
+                            }
                             inCode = false;
                             codeBlock = '';
                             codeLanguage = '';
@@ -379,6 +405,21 @@
                 }
             } else {
                 statusMsg = 'WARNING: hljs not defined!';
+            }
+            
+            // Render Mermaid diagrams
+            if (typeof mermaid !== 'undefined') {
+                var mermaidDivs = preview.querySelectorAll('.mermaid');
+                if (mermaidDivs.length > 0) {
+                    try {
+                        mermaid.run({
+                            nodes: mermaidDivs
+                        });
+                        statusMsg += ' | ' + mermaidDivs.length + ' diagram(s)';
+                    } catch (err) {
+                        console.error('Mermaid error:', err);
+                    }
+                }
             }
             
             setStatus(statusMsg);

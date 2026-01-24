@@ -57,34 +57,38 @@ namespace ClarionMarkdownEditor
                 // Disable context menu entirely
                 webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
                 
-                // Load the embedded HTML resource
-                var assembly = Assembly.GetExecutingAssembly();
-                var resourceName = "ClarionMarkdownEditor.Resources.markdown-editor.html";
-                System.Diagnostics.Debug.WriteLine($"Loading resource: {resourceName}");
-
-                using (var stream = assembly.GetManifestResourceStream(resourceName))
+                // Set up virtual host mapping to enable CDN scripts (Mermaid, etc.)
+                var addinDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var resourcesPath = Path.Combine(addinDir, "Resources");
+                System.Diagnostics.Debug.WriteLine($"Setting up virtual host: app.local -> {resourcesPath}");
+                
+                webView.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                    "app.local",
+                    resourcesPath,
+                    Microsoft.Web.WebView2.Core.CoreWebView2HostResourceAccessKind.Allow
+                );
+                
+                // Load markdown-editor.html via virtual host (enables CDN)
+                System.Diagnostics.Debug.WriteLine("Navigating to https://app.local/markdown-editor.html");
+                
+                // Inject Highlight.js before navigating
+                var htmlPath = Path.Combine(resourcesPath, "markdown-editor.html");
+                if (File.Exists(htmlPath))
                 {
-                    if (stream != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Resource stream found, length: {stream.Length}");
-                        using (var reader = new StreamReader(stream))
-                        {
-                            string html = reader.ReadToEnd();
-                            System.Diagnostics.Debug.WriteLine($"HTML loaded, length: {html.Length}");
-                            
-                            // Inject highlight.js from external files
-                            html = InjectHighlightJs(html);
-                            System.Diagnostics.Debug.WriteLine($"After injection, HTML length: {html.Length}");
-                            
-                            webView.NavigateToString(html);
-                            System.Diagnostics.Debug.WriteLine("NavigateToString called");
-                        }
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("Resource stream is NULL!");
-                        webView.NavigateToString(GetFallbackHtml());
-                    }
+                    var html = File.ReadAllText(htmlPath);
+                    html = InjectHighlightJs(html);
+                    
+                    // Write modified HTML to temp location
+                    var tempHtmlPath = Path.Combine(resourcesPath, "markdown-editor-temp.html");
+                    File.WriteAllText(tempHtmlPath, html);
+                    
+                    webView.CoreWebView2.Navigate("https://app.local/markdown-editor-temp.html");
+                    System.Diagnostics.Debug.WriteLine("Navigated to modified HTML with Highlight.js injected");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"ERROR: markdown-editor.html not found at {htmlPath}");
+                    MessageBox.Show("markdown-editor.html not found!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)

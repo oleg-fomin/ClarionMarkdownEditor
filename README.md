@@ -11,6 +11,10 @@ A modern Markdown file viewer and editor addin for the Clarion IDE. Features a s
 
 - **Split-Pane Editor**: Side-by-side markdown source and live HTML preview
 - **Live Preview**: Real-time rendering as you type
+- **Mermaid Diagrams**: Create flowcharts, sequence diagrams, ERDs, Gantt charts, and more
+  - Just use ` ```mermaid ` code blocks
+  - See `MermaidExample.md` for examples
+  - Supports all Mermaid diagram types (flowchart, sequence, ER, Gantt, state, class, etc.)
 - **Syntax Highlighting**: Full code syntax highlighting powered by Highlight.js
   - Custom Clarion language definition included
   - Supports 190+ languages (JavaScript, Python, C#, SQL, etc.)
