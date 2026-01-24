@@ -35,6 +35,9 @@ namespace ClarionMarkdownEditor
                 await webView.EnsureCoreWebView2Async(null);
                 _isWebView2Ready = true;
                 
+                // Disable context menu entirely
+                webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+                
                 // Load the embedded HTML resource
                 var assembly = Assembly.GetExecutingAssembly();
                 var resourceName = "ClarionMarkdownEditor.Resources.markdown-editor.html";
@@ -49,15 +52,6 @@ namespace ClarionMarkdownEditor
                             
                             // Inject highlight.js from external files
                             html = InjectHighlightJs(html);
-                            
-                            // Debug: Save injected HTML to temp file
-                            try
-                            {
-                                var tempPath = Path.Combine(Path.GetTempPath(), "markdown-editor-debug.html");
-                                File.WriteAllText(tempPath, html);
-                                System.Diagnostics.Debug.WriteLine($"DEBUG: HTML saved to {tempPath}");
-                            }
-                            catch { }
                             
                             webView.NavigateToString(html);
                         }
