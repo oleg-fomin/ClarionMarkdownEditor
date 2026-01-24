@@ -496,9 +496,9 @@ namespace ClarionMarkdownEditor
             }
         }
 
-        private void InsertToIdeEditor()
+        private async void InsertToIdeEditor()
         {
-            string content = GetEditorContent();
+            string content = await GetEditorContentAsync();
             if (content != null)
             {
                 var result = _editorService.InsertTextAtCaret(content);
@@ -515,17 +515,15 @@ namespace ClarionMarkdownEditor
         #region JavaScript Communication
 
         /// <summary>
-        /// Gets the current content from the JavaScript editor.
+        /// Gets the current content from the JavaScript editor (async).
         /// </summary>
-        private string GetEditorContent()
+        private async Task<string> GetEditorContentAsync()
         {
             if (_isWebView2Ready)
             {
                 try
                 {
-                    var task = webView.ExecuteScriptAsync("getEditorContent()");
-                    task.Wait();
-                    var result = task.Result;
+                    var result = await webView.ExecuteScriptAsync("getEditorContent()");
                     // Remove surrounding quotes from JSON string
                     if (result.StartsWith("\"") && result.EndsWith("\""))
                     {
@@ -540,6 +538,15 @@ namespace ClarionMarkdownEditor
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Gets the current content from the JavaScript editor (synchronous wrapper - avoid if possible).
+        /// </summary>
+        private string GetEditorContent()
+        {
+            // Use GetAwaiter().GetResult() instead of .Wait() to avoid deadlocks
+            return GetEditorContentAsync().GetAwaiter().GetResult();
         }
 
         private void SendContentToJs(string content, string fileName)
