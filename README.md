@@ -16,18 +16,13 @@ A modern Markdown file viewer and editor addin for the Clarion IDE. Features a s
   - Supports 190+ languages (JavaScript, Python, C#, SQL, etc.)
   - Atom One Dark theme (works in both light and dark modes)
   
-  Example usage:
-  ```
-  Type this in your markdown:
+  To use syntax highlighting, type three backticks followed by the language name:
   
   ```clarion
   MyProc PROCEDURE
   CODE
     MESSAGE('Hello from Clarion!')
     RETURN
-  ```
-  
-  And it renders with beautiful syntax highlighting!
   ```
 - **Dark Mode**: Toggle between light and dark themes with 🌓/☀️ button
 - **Scroll Synchronization**: Bidirectional scroll sync between editor and preview (toggleable)
