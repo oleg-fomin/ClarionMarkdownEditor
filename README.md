@@ -1,15 +1,23 @@
 # ClarionMarkdownEditor
 
-A Markdown file viewer and editor addin for the Clarion IDE. Features a split-pane interface with live preview, formatting toolbar, and seamless IDE integration.
+A modern Markdown file viewer and editor addin for the Clarion IDE. Features a split-pane interface with live preview, syntax highlighting, dark mode, scroll synchronization, and seamless IDE integration.
 
 ![Clarion IDE Addin](https://img.shields.io/badge/Clarion-IDE%20Addin-blue)
-![.NET Framework 4.0](https://img.shields.io/badge/.NET%20Framework-4.0-purple)
+![.NET Framework 4.8](https://img.shields.io/badge/.NET%20Framework-4.8-purple)
+![WebView2](https://img.shields.io/badge/WebView2-Chromium-green)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Features
 
 - **Split-Pane Editor**: Side-by-side markdown source and live HTML preview
 - **Live Preview**: Real-time rendering as you type
+- **Syntax Highlighting**: Full code syntax highlighting powered by Highlight.js
+  - Custom Clarion language definition included
+  - Supports 190+ languages (JavaScript, Python, C#, SQL, etc.)
+  - Atom One Dark theme (works in both light and dark modes)
+- **Dark Mode**: Toggle between light and dark themes with 🌓/☀️ button
+- **Scroll Synchronization**: Bidirectional scroll sync between editor and preview (toggleable)
+- **Horizontal Scrolling**: Long lines scroll instead of wrapping
 - **Expand/Collapse Preview**: Toggle between split view and full-width preview mode
 - **Formatting Toolbar**: Quick buttons for common markdown syntax:
   - Bold, Italic, Inline Code, Code Blocks
@@ -25,6 +33,91 @@ A Markdown file viewer and editor addin for the Clarion IDE. Features a split-pa
   - `Ctrl+I` - Italic
 - **Dockable Pad**: Can be docked anywhere in the Clarion IDE workspace
 - **Remembers Settings**: Last opened folder is saved between sessions
+- **Clean UI**: No context menus or distractions
+
+## Requirements
+
+### Runtime (End Users)
+- Clarion 11.1 or Clarion 12
+- .NET Framework 4.8 or higher
+- **Microsoft Edge WebView2 Runtime** (usually pre-installed on Windows 10/11)
+  - Download: https://developer.microsoft.com/microsoft-edge/webview2/
+
+### Development (Building from Source)
+- Visual Studio 2017 or later (or MSBuild 15+)
+- .NET Framework 4.8 SDK
+- Clarion IDE installed (for reference DLLs)
+- NuGet Package Manager
+
+## Installation
+
+### From Release
+
+1. Download the latest release
+2. Copy all files to:
+   ```
+   {CLARION_PATH}\accessory\addins\MarkdownEditor\
+   ```
+   Required files:
+   - `ClarionMarkdownEditor.dll`
+   - `ClarionMarkdownEditor.addin`
+   - `Microsoft.Web.WebView2.Core.dll`
+   - `Microsoft.Web.WebView2.WinForms.dll`
+   - `WebView2Loader.dll`
+   - `Resources\highlight.min.js`
+   - `Resources\atom-one-dark.min.css`
+3. Ensure WebView2 Runtime is installed
+4. Restart Clarion IDE
+
+### Building from Source
+
+1. **Clone this repository**
+   ```bash
+   git clone https://github.com/msarson/ClarionMarkdownEditor.git
+   cd ClarionMarkdownEditor
+   ```
+
+2. **Restore NuGet packages**
+   The project uses `packages.config` to reference:
+   - Microsoft.Web.WebView2 (v1.0.2792.45)
+   
+   Packages will restore automatically on build, or manually:
+   ```bash
+   nuget restore ClarionMarkdownEditor.sln
+   # OR
+   dotnet restore ClarionMarkdownEditor.sln
+   ```
+
+3. **Update Clarion reference paths**
+   
+   Edit `ClarionMarkdownEditor\ClarionMarkdownEditor.csproj` and update `HintPath` to match your Clarion installation:
+   ```xml
+   <HintPath>C:\Clarion\Clarion11.1\bin\ICSharpCode.Core.dll</HintPath>
+   <HintPath>C:\Clarion\Clarion11.1\bin\ICSharpCode.SharpDevelop.dll</HintPath>
+   ```
+   
+   Change `C:\Clarion\Clarion11.1` to your Clarion path (e.g., `C:\Clarion12`).
+
+4. **Build in Release configuration**
+   ```bash
+   dotnet build ClarionMarkdownEditor.sln -c Release
+   # OR
+   msbuild ClarionMarkdownEditor.sln /p:Configuration=Release
+   ```
+
+5. **Deploy to Clarion**
+   
+   Copy from `ClarionMarkdownEditor\bin\Release\` to `{CLARION_PATH}\accessory\addins\MarkdownEditor\`:
+   - `ClarionMarkdownEditor.dll`
+   - `ClarionMarkdownEditor.addin`
+   - `Microsoft.Web.WebView2.Core.dll`
+   - `Microsoft.Web.WebView2.WinForms.dll`
+   - `Microsoft.Web.WebView2.Wpf.dll`
+   - `WebView2Loader.dll`
+   - `Resources\highlight.min.js`
+   - `Resources\atom-one-dark.min.css`
+
+6. **Restart Clarion IDE**
 
 ## Screenshots
 
@@ -65,31 +158,87 @@ A Markdown file viewer and editor addin for the Clarion IDE. Features a split-pa
 
 ## Requirements
 
-- Clarion 11 or Clarion 12
-- .NET Framework 4.0
+### Runtime (End Users)
+- Clarion 11.1 or Clarion 12
+- .NET Framework 4.8 or higher
+- **Microsoft Edge WebView2 Runtime** (usually pre-installed on Windows 10/11)
+  - Download: https://developer.microsoft.com/microsoft-edge/webview2/
+
+### Development (Building from Source)
+- Visual Studio 2017 or later (or MSBuild 15+)
+- .NET Framework 4.8 SDK
+- Clarion IDE installed (for reference DLLs)
+- NuGet Package Manager
 
 ## Installation
 
 ### From Release
 
 1. Download the latest release
-2. Copy `ClarionMarkdownEditor.dll` and `ClarionMarkdownEditor.addin` to:
+2. Copy all files to:
    ```
-   {CLARION_PATH}\accessory\addins\MarkdownAddin\
+   {CLARION_PATH}\accessory\addins\MarkdownEditor\
    ```
-3. Restart Clarion IDE
+   Required files:
+   - `ClarionMarkdownEditor.dll`
+   - `ClarionMarkdownEditor.addin`
+   - `Microsoft.Web.WebView2.Core.dll`
+   - `Microsoft.Web.WebView2.WinForms.dll`
+   - `WebView2Loader.dll`
+   - `Resources\highlight.min.js`
+   - `Resources\atom-one-dark.min.css`
+3. Ensure WebView2 Runtime is installed
+4. Restart Clarion IDE
 
 ### Building from Source
 
-1. Clone this repository
-2. Open `ClarionMarkdownEditor.sln` in Visual Studio
-3. Update the reference paths in the `.csproj` if your Clarion installation differs:
-   ```xml
-   <HintPath>C:\Clarion12\bin\ICSharpCode.Core.dll</HintPath>
-   <HintPath>C:\Clarion12\bin\ICSharpCode.SharpDevelop.dll</HintPath>
+1. **Clone this repository**
+   ```bash
+   git clone https://github.com/msarson/ClarionMarkdownEditor.git
+   cd ClarionMarkdownEditor
    ```
-4. Build in Release configuration
-5. Copy output files to the Clarion addins folder
+
+2. **Restore NuGet packages**
+   The project uses `packages.config` to reference:
+   - Microsoft.Web.WebView2 (v1.0.2792.45)
+   
+   Packages will restore automatically on build, or manually:
+   ```bash
+   nuget restore ClarionMarkdownEditor.sln
+   # OR
+   dotnet restore ClarionMarkdownEditor.sln
+   ```
+
+3. **Update Clarion reference paths**
+   
+   Edit `ClarionMarkdownEditor\ClarionMarkdownEditor.csproj` and update `HintPath` to match your Clarion installation:
+   ```xml
+   <HintPath>C:\Clarion\Clarion11.1\bin\ICSharpCode.Core.dll</HintPath>
+   <HintPath>C:\Clarion\Clarion11.1\bin\ICSharpCode.SharpDevelop.dll</HintPath>
+   ```
+   
+   Change `C:\Clarion\Clarion11.1` to your Clarion path (e.g., `C:\Clarion12`).
+
+4. **Build in Release configuration**
+   ```bash
+   dotnet build ClarionMarkdownEditor.sln -c Release
+   # OR
+   msbuild ClarionMarkdownEditor.sln /p:Configuration=Release
+   ```
+
+5. **Deploy to Clarion**
+   
+   Copy from `ClarionMarkdownEditor\bin\Release\` to `{CLARION_PATH}\accessory\addins\MarkdownEditor\`:
+   - `ClarionMarkdownEditor.dll`
+   - `ClarionMarkdownEditor.addin`
+   - `Microsoft.Web.WebView2.Core.dll`
+   - `Microsoft.Web.WebView2.WinForms.dll`
+   - `Microsoft.Web.WebView2.Wpf.dll`
+   - `WebView2Loader.dll`
+   - `Resources\highlight.min.js`
+   - `Resources\atom-one-dark.min.css`
+
+6. **Restart Clarion IDE**
 
 ## Usage
 
@@ -161,18 +310,29 @@ MarkDownAddin/
 
 ### Architecture
 
-- **UI Layer**: HTML/CSS/JavaScript embedded in a WebBrowser control
-- **Native Toolbar**: WinForms ToolStrip for file operations (more reliable than JS-to-C# calls)
+- **UI Layer**: HTML/CSS/JavaScript in WebView2 (Chromium-based)
+- **Modern Browser Engine**: WebView2 provides full modern web standards support
+- **Native Toolbar**: WinForms ToolStrip for file operations
 - **Markdown Parser**: Custom lightweight parser implemented in JavaScript
+- **Syntax Highlighting**: Highlight.js 11.9.0 with custom Clarion language definition
 - **IDE Integration**: Uses reflection for compatibility across Clarion IDE versions
 
-### Why WebBrowser Control?
+### Why WebView2?
 
-The WebBrowser control allows for rich HTML rendering of the markdown preview, with proper styling for:
-- Headers with border separators
-- Syntax-highlighted code blocks
-- Styled tables, blockquotes, and lists
-- Responsive layout
+Migrated from old IE-based WebBrowser to WebView2 (Chromium) to enable:
+- Modern JavaScript support (ES6+)
+- Proper execution of minified libraries
+- Full CSS3 support including flexbox and grid
+- Better performance and security
+- Syntax highlighting with Highlight.js
+
+### Syntax Highlighting Implementation
+
+- **Library**: Highlight.js 11.9.0
+- **Theme**: Atom One Dark
+- **Injection**: C#-based file injection (no CDN dependencies, works offline)
+- **Custom Language**: Full Clarion language definition from [discourse-highlightjs-clarion](https://github.com/msarson/discourse-highlightjs-clarion)
+- **Files**: `highlight.min.js` (121KB) and `atom-one-dark.min.css` (856 bytes)
 
 ### Settings Storage
 
@@ -180,6 +340,29 @@ User settings are stored in:
 ```
 %APPDATA%\ClarionMarkdownEditor\settings.txt
 ```
+
+## Development Notes
+
+### Key Commits
+
+1. **Initial commit**: Basic markdown editor with WebBrowser control
+2. **Dark mode & UI enhancements**: Added dark mode, scroll sync, horizontal scrolling
+3. **WebView2 migration**: Replaced IE WebBrowser with Chromium WebView2
+4. **Syntax highlighting**: Integrated Highlight.js with custom Clarion support
+
+### Known Limitations
+
+- **WebView2 Runtime Required**: Users must have WebView2 Runtime installed (typically pre-installed on Windows 10/11)
+- **32-bit Only**: Built for x86 to match Clarion IDE architecture
+- **Print Feature**: Print styles included but pagination needs work
+
+### Future Enhancements
+
+- Multi-page print support
+- Export to PDF
+- Markdown templates
+- Spell checking
+- Find/Replace in editor
 
 ## Contributing
 
