@@ -31,6 +31,19 @@ namespace ClarionMarkdownEditor
         {
             try
             {
+                // Check if WebView2 Runtime is available
+                string runtimeVersion = null;
+                try
+                {
+                    runtimeVersion = Microsoft.Web.WebView2.Core.CoreWebView2Environment.GetAvailableBrowserVersionString();
+                }
+                catch
+                {
+                    // Runtime not found
+                    ShowWebView2InstallPrompt();
+                    return;
+                }
+
                 // Initialize WebView2
                 await webView.EnsureCoreWebView2Async(null);
                 _isWebView2Ready = true;
@@ -64,8 +77,108 @@ namespace ClarionMarkdownEditor
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error initializing WebView2: {ex.Message}\n\nMake sure WebView2 Runtime is installed.", 
+                MessageBox.Show($"Error initializing WebView2: {ex.Message}\n\nPlease try reinstalling the WebView2 Runtime.", 
                     "WebView2 Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ShowWebView2InstallPrompt()
+        {
+            var result = MessageBox.Show(
+                "Microsoft Edge WebView2 Runtime is required but not installed.\n\n" +
+                "WebView2 provides the modern browser engine for this markdown editor.\n\n" +
+                "Would you like to download it now?\n\n" +
+                "Download: https://go.microsoft.com/fwlink/p/?LinkId=2124703\n" +
+                "(~100MB download, system-wide install)",
+                "WebView2 Runtime Required",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Information);
+
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    System.Diagnostics.Process.Start("https://go.microsoft.com/fwlink/p/?LinkId=2124703");
+                }
+                catch
+                {
+                    MessageBox.Show(
+                        "Unable to open browser automatically.\n\n" +
+                        "Please manually visit:\n" +
+                        "https://go.microsoft.com/fwlink/p/?LinkId=2124703",
+                        "Download WebView2",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+            }
+
+            // Show fallback message in the control
+            var fallbackHtml = @"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            padding: 40px; 
+            background: #f5f5f5; 
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h2 { color: #d32f2f; margin-bottom: 20px; }
+        p { line-height: 1.6; color: #555; margin-bottom: 15px; }
+        .download-link { 
+            display: inline-block;
+            padding: 12px 24px;
+            background: #0078d4;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+        .download-link:hover { background: #106ebe; }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h2>⚠️ WebView2 Runtime Required</h2>
+        <p>The Markdown Editor requires <strong>Microsoft Edge WebView2 Runtime</strong> to function.</p>
+        <p>This provides the modern browser engine for rendering markdown with syntax highlighting.</p>
+        <p><strong>Most Windows 10/11 systems have this pre-installed.</strong></p>
+        <p>If you're seeing this message, please download and install it:</p>
+        <a href='https://go.microsoft.com/fwlink/p/?LinkId=2124703' class='download-link' target='_blank'>
+            Download WebView2 Runtime (~100MB)
+        </a>
+        <p style='margin-top: 30px; font-size: 12px; color: #888;'>
+            After installation, restart Clarion IDE and this editor will work.
+        </p>
+    </div>
+</body>
+</html>";
+            
+            // This will fail since webView isn't initialized, but that's okay - we're showing the message
+            try
+            {
+                webView.NavigateToString(fallbackHtml);
+            }
+            catch
+            {
+                // Silently fail - user already got the message box
             }
         }
 
