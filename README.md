@@ -15,6 +15,16 @@ A modern Markdown file viewer and editor addin for the Clarion IDE. Features a s
   - Custom Clarion language definition included
   - Supports 190+ languages (JavaScript, Python, C#, SQL, etc.)
   - Atom One Dark theme (works in both light and dark modes)
+  
+  Example Clarion code block:
+  ````markdown
+  ```clarion
+  MyProc PROCEDURE
+  CODE
+    MESSAGE('Hello from Clarion!')
+    RETURN
+  ```
+  ````
 - **Dark Mode**: Toggle between light and dark themes with 🌓/☀️ button
 - **Scroll Synchronization**: Bidirectional scroll sync between editor and preview (toggleable)
 - **Horizontal Scrolling**: Long lines scroll instead of wrapping
@@ -374,22 +384,13 @@ MIT License - see LICENSE file for details.
 
 ## Author
 
-John Hickey
+msarson (fork with WebView2 enhancements)
+
+Original author: John Hickey
 
 ## Acknowledgments
 
 - Built for the Clarion IDE (SharpDevelop-based)
 - Inspired by popular markdown editors like Typora and Mark Text
+- Custom Clarion syntax highlighting from [discourse-highlightjs-clarion](https://github.com/msarson/discourse-highlightjs-clarion)
 
-```clarion
-     MyProc PROCEDURE
-     CODE
-       MESSAGE('Hello from Clarion!')
-       RETURN
-```
-```javascript
-function test() {
-  console.log('Hello');
-}
-
-```
