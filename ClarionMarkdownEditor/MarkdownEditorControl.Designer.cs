@@ -4,21 +4,36 @@ namespace ClarionMarkdownEditor
     {
         private System.ComponentModel.IContainer components = null;
         private Microsoft.Web.WebView2.WinForms.WebView2 webView;
-        private System.Windows.Forms.ToolStrip toolStrip;
-        private System.Windows.Forms.ToolStripButton btnNew;
-        private System.Windows.Forms.ToolStripButton btnOpen;
-        private System.Windows.Forms.ToolStripButton btnSave;
-        private System.Windows.Forms.ToolStripButton btnSaveAs;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripButton btnInsertToIDE;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripLabel lblFileName;
+        private System.Windows.Forms.MenuStrip menuStrip;
+        private System.Windows.Forms.ToolStripMenuItem menuFile;
+        private System.Windows.Forms.ToolStripMenuItem menuNew;
+        private System.Windows.Forms.ToolStripMenuItem menuOpen;
+        private System.Windows.Forms.ToolStripMenuItem menuRecent;
+        private System.Windows.Forms.ToolStripMenuItem menuSave;
+        private System.Windows.Forms.ToolStripMenuItem menuSaveAs;
+        private System.Windows.Forms.ToolStripMenuItem menuAbout;
+        private System.Windows.Forms.ToolStripMenuItem menuView;
+        private System.Windows.Forms.ToolStripMenuItem menuShowStartPage;
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
-                components.Dispose();
+                // Remove message filter
+                if (_menuCloseFilter != null)
+                {
+                    System.Windows.Forms.Application.RemoveMessageFilter(_menuCloseFilter);
+                    _menuCloseFilter = null;
+                }
+
+                components?.Dispose();
+
+                // Clean up temp HTML file
+                if (!string.IsNullOrEmpty(_tempHtmlPath) && System.IO.File.Exists(_tempHtmlPath))
+                {
+                    try { System.IO.File.Delete(_tempHtmlPath); }
+                    catch { /* Ignore cleanup errors */ }
+                }
             }
             base.Dispose(disposing);
         }
@@ -27,106 +42,112 @@ namespace ClarionMarkdownEditor
 
         private void InitializeComponent()
         {
-            this.toolStrip = new System.Windows.Forms.ToolStrip();
-            this.btnNew = new System.Windows.Forms.ToolStripButton();
-            this.btnOpen = new System.Windows.Forms.ToolStripButton();
-            this.btnSave = new System.Windows.Forms.ToolStripButton();
-            this.btnSaveAs = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.btnInsertToIDE = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.lblFileName = new System.Windows.Forms.ToolStripLabel();
+            this.menuStrip = new System.Windows.Forms.MenuStrip();
+            this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuNew = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuRecent = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSave = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSaveAs = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuView = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuShowStartPage = new System.Windows.Forms.ToolStripMenuItem();
             this.webView = new Microsoft.Web.WebView2.WinForms.WebView2();
             ((System.ComponentModel.ISupportInitialize)(this.webView)).BeginInit();
-            this.toolStrip.SuspendLayout();
+            this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             //
-            // toolStrip
+            // menuStrip
             //
-            this.toolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.btnNew,
-                this.btnOpen,
-                this.btnSave,
-                this.btnSaveAs,
-                this.toolStripSeparator1,
-                this.btnInsertToIDE,
-                this.toolStripSeparator2,
-                this.lblFileName
+            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuFile,
+                this.menuView
             });
-            this.toolStrip.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Size = new System.Drawing.Size(600, 25);
-            this.toolStrip.TabIndex = 0;
+            this.menuStrip.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(600, 24);
+            this.menuStrip.TabIndex = 0;
             //
-            // btnNew
+            // menuFile
             //
-            this.btnNew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnNew.Name = "btnNew";
-            this.btnNew.Size = new System.Drawing.Size(35, 22);
-            this.btnNew.Text = "New";
-            this.btnNew.ToolTipText = "New file";
-            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
+            this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuNew,
+                this.menuOpen,
+                this.menuRecent,
+                new System.Windows.Forms.ToolStripSeparator(),
+                this.menuSave,
+                this.menuSaveAs,
+                new System.Windows.Forms.ToolStripSeparator(),
+                this.menuAbout
+            });
+            this.menuFile.Name = "menuFile";
+            this.menuFile.Size = new System.Drawing.Size(37, 20);
+            this.menuFile.Text = "&File";
             //
-            // btnOpen
+            // menuNew
             //
-            this.btnOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(40, 22);
-            this.btnOpen.Text = "Open";
-            this.btnOpen.ToolTipText = "Open file";
-            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            this.menuNew.Name = "menuNew";
+            this.menuNew.Size = new System.Drawing.Size(180, 22);
+            this.menuNew.Text = "&New";
+            this.menuNew.Click += new System.EventHandler(this.btnNew_Click);
             //
-            // btnSave
+            // menuOpen
             //
-            this.btnSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(35, 22);
-            this.btnSave.Text = "Save";
-            this.btnSave.ToolTipText = "Save file";
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.menuOpen.Name = "menuOpen";
+            this.menuOpen.Size = new System.Drawing.Size(180, 22);
+            this.menuOpen.Text = "&Open...";
+            this.menuOpen.Click += new System.EventHandler(this.btnOpen_Click);
             //
-            // btnSaveAs
+            // menuRecent
             //
-            this.btnSaveAs.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnSaveAs.Name = "btnSaveAs";
-            this.btnSaveAs.Size = new System.Drawing.Size(52, 22);
-            this.btnSaveAs.Text = "Save As";
-            this.btnSaveAs.ToolTipText = "Save file as...";
-            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
+            this.menuRecent.Name = "menuRecent";
+            this.menuRecent.Size = new System.Drawing.Size(180, 22);
+            this.menuRecent.Text = "&Recent Files";
+            this.menuRecent.DropDownOpening += new System.EventHandler(this.menuRecent_DropDownOpening);
             //
-            // toolStripSeparator1
+            // menuSave
             //
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            this.menuSave.Name = "menuSave";
+            this.menuSave.Size = new System.Drawing.Size(180, 22);
+            this.menuSave.Text = "&Save";
+            this.menuSave.Click += new System.EventHandler(this.btnSave_Click);
             //
-            // btnInsertToIDE
+            // menuSaveAs
             //
-            this.btnInsertToIDE.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnInsertToIDE.Name = "btnInsertToIDE";
-            this.btnInsertToIDE.Size = new System.Drawing.Size(75, 22);
-            this.btnInsertToIDE.Text = "Insert to IDE";
-            this.btnInsertToIDE.ToolTipText = "Insert markdown to active IDE editor";
-            this.btnInsertToIDE.Click += new System.EventHandler(this.btnInsertToIDE_Click);
+            this.menuSaveAs.Name = "menuSaveAs";
+            this.menuSaveAs.Size = new System.Drawing.Size(180, 22);
+            this.menuSaveAs.Text = "Save &As...";
+            this.menuSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
             //
-            // toolStripSeparator2
+            // menuAbout
             //
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            this.menuAbout.Name = "menuAbout";
+            this.menuAbout.Size = new System.Drawing.Size(180, 22);
+            this.menuAbout.Text = "&About...";
+            this.menuAbout.Click += new System.EventHandler(this.menuAbout_Click);
             //
-            // lblFileName
+            // menuView
             //
-            this.lblFileName.Name = "lblFileName";
-            this.lblFileName.Size = new System.Drawing.Size(50, 22);
-            this.lblFileName.Text = "Untitled";
-            this.lblFileName.ForeColor = System.Drawing.Color.Gray;
+            this.menuView.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuShowStartPage});
+            this.menuView.Name = "menuView";
+            this.menuView.Size = new System.Drawing.Size(44, 20);
+            this.menuView.Text = "&View";
+            this.menuView.DropDownOpening += new System.EventHandler(this.menuView_DropDownOpening);
+            //
+            // menuShowStartPage
+            //
+            this.menuShowStartPage.Name = "menuShowStartPage";
+            this.menuShowStartPage.Size = new System.Drawing.Size(180, 22);
+            this.menuShowStartPage.Text = "Start Page";
+            this.menuShowStartPage.Click += new System.EventHandler(this.menuShowStartPage_Click);
             //
             // webView
             //
             this.webView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.webView.Location = new System.Drawing.Point(0, 25);
+            this.webView.Location = new System.Drawing.Point(0, 24);
             this.webView.Name = "webView";
-            this.webView.Size = new System.Drawing.Size(600, 375);
+            this.webView.Size = new System.Drawing.Size(600, 376);
             this.webView.TabIndex = 1;
             //
             // MarkdownEditorControl
@@ -134,12 +155,12 @@ namespace ClarionMarkdownEditor
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.webView);
-            this.Controls.Add(this.toolStrip);
+            this.Controls.Add(this.menuStrip);
             this.Name = "MarkdownEditorControl";
             this.Size = new System.Drawing.Size(600, 400);
             ((System.ComponentModel.ISupportInitialize)(this.webView)).EndInit();
-            this.toolStrip.ResumeLayout(false);
-            this.toolStrip.PerformLayout();
+            this.menuStrip.ResumeLayout(false);
+            this.menuStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
         }

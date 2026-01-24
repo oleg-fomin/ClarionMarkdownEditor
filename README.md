@@ -39,6 +39,7 @@ A modern Markdown file viewer and editor addin for the Clarion IDE. Features a s
   - Blockquotes, Horizontal Rules
   - Links, Images, Tables
 - **File Operations**: New, Open, Save, Save As
+- **About Dialog**: View credits and project information (File > About)
 - **IDE Integration**: Insert markdown content directly into the active Clarion editor
 - **Keyboard Shortcuts**:
   - `Ctrl+Alt+M` - Open Markdown Editor pad
@@ -385,15 +386,18 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 MIT License - see LICENSE file for details.
 
-## Author
+## Authors
 
-msarson (fork with WebView2 enhancements)
+- **John Hickey** - Original author
+- **Mark Sarson** - WebView2 enhancements, Mermaid support
+- **Claude Code** - AI pair programming assistant
 
-Original author: John Hickey
+From an idea by **Dinko Bacon**
 
 ## Acknowledgments
 
 - Built for the Clarion IDE (SharpDevelop-based)
 - Inspired by popular markdown editors like Typora and Mark Text
 - Custom Clarion syntax highlighting from [discourse-highlightjs-clarion](https://github.com/msarson/discourse-highlightjs-clarion)
+- [ClarionLive](https://www.clarionlive.com) - Clarion developer community
 

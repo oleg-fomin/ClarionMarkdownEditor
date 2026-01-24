@@ -18,6 +18,8 @@
 
         /* Print styles - hide everything except markdown preview */
         @media print {
+            .tab-bar,
+            .tab-context-menu,
             .format-toolbar,
             .editor-pane,
             .status-bar,
@@ -102,6 +104,11 @@
         .preview-pane.fullscreen { flex: 1; border-left: none; }
         .format-toolbar.hidden { display: none; }
 
+        /* Horizontal split mode (stacked top/bottom) */
+        .editor-container.horizontal-split { flex-direction: column; }
+        .editor-container.horizontal-split .editor-pane { border-right: none; border-bottom: 1px solid #ccc; }
+        body.dark-mode .editor-container.horizontal-split .editor-pane { border-bottom-color: #3e3e3e; }
+
         /* Markdown preview styles */
         .preview-content h1 { font-size: 1.8em; margin: 0.5em 0; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
         .preview-content h2 { font-size: 1.5em; margin: 0.5em 0; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
@@ -132,7 +139,93 @@
 
         /* Status bar */
         .statusbar { padding: 4px 8px; background: #e0e0e0; border-top: 1px solid #ccc; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
-        
+
+        /* Tab bar styles */
+        .tab-bar {
+            display: flex;
+            background: #2d2d2d;
+            border-bottom: 1px solid #3e3e3e;
+            overflow-x: auto;
+            overflow-y: hidden;
+            min-height: 32px;
+            scrollbar-width: thin;
+            scrollbar-color: #555 #2d2d2d;
+        }
+        .tab-bar::-webkit-scrollbar { height: 6px; }
+        .tab-bar::-webkit-scrollbar-track { background: #2d2d2d; }
+        .tab-bar::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+        .tab-bar::-webkit-scrollbar-thumb:hover { background: #666; }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: #252525;
+            color: #888;
+            border-right: 1px solid #3e3e3e;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 12px;
+            min-width: 80px;
+            max-width: 200px;
+            user-select: none;
+        }
+        .tab:hover { background: #333; color: #aaa; }
+        .tab.active { background: #1e1e1e; color: #d4d4d4; border-bottom: 2px solid #007acc; }
+        .tab .tab-title { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+        .tab .tab-dirty { color: #ffc107; margin-right: 4px; font-weight: bold; }
+        .tab .tab-close {
+            margin-left: 8px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 14px;
+            line-height: 1;
+            color: #888;
+        }
+        .tab .tab-close:hover { background: #555; color: #fff; }
+        .tab.active .tab-close { color: #aaa; }
+        .tab.active .tab-close:hover { background: #555; color: #fff; }
+
+        /* Tab context menu */
+        .tab-context-menu {
+            position: fixed;
+            background: #2d2d2d;
+            border: 1px solid #3e3e3e;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            z-index: 10000;
+            min-width: 180px;
+            padding: 4px 0;
+            display: none;
+        }
+        .tab-context-menu.visible { display: block; }
+        .tab-context-menu-item {
+            padding: 8px 16px;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .tab-context-menu-item:hover { background: #3e3e3e; color: #fff; }
+        .tab-context-menu-separator {
+            height: 1px;
+            background: #3e3e3e;
+            margin: 4px 0;
+        }
+
+        /* Light mode tab bar overrides */
+        body:not(.dark-mode) .tab-bar { background: #e8e8e8; border-bottom-color: #ccc; }
+        body:not(.dark-mode) .tab-bar::-webkit-scrollbar-track { background: #e8e8e8; }
+        body:not(.dark-mode) .tab-bar::-webkit-scrollbar-thumb { background: #aaa; }
+        body:not(.dark-mode) .tab { background: #ddd; color: #666; border-right-color: #ccc; }
+        body:not(.dark-mode) .tab:hover { background: #d0d0d0; color: #444; }
+        body:not(.dark-mode) .tab.active { background: #fff; color: #333; border-bottom-color: #007acc; }
+        body:not(.dark-mode) .tab .tab-close { color: #888; }
+        body:not(.dark-mode) .tab .tab-close:hover { background: #bbb; color: #333; }
+        body:not(.dark-mode) .tab-context-menu { background: #fff; border-color: #ccc; }
+        body:not(.dark-mode) .tab-context-menu-item { color: #333; }
+        body:not(.dark-mode) .tab-context-menu-item:hover { background: #e0e0e0; color: #000; }
+        body:not(.dark-mode) .tab-context-menu-separator { background: #ddd; }
+
         /* Dark mode */
         body.dark-mode .container { background: #1e1e1e; }
         body.dark-mode .format-toolbar { background: #2d2d2d; border-bottom-color: #3e3e3e; }
@@ -156,10 +249,389 @@
         body.dark-mode .preview-content a { color: #4da6ff; }
         body.dark-mode .preview-content hr { border-top-color: #3e3e3e; }
         body.dark-mode .statusbar { background: #252525; border-top-color: #3e3e3e; color: #aaa; }
+
+        /* Start Page Styles - Light Mode (default) */
+        .start-page {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            overflow: auto;
+            flex: 1;
+        }
+        .start-page-content {
+            max-width: 800px;
+            width: 100%;
+        }
+        .start-page-banner {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .start-page-title {
+            font-size: 2.2em;
+            color: #2d3436;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+        .start-page-subtitle {
+            font-size: 1.1em;
+            color: #636e72;
+            margin: 0;
+        }
+        .start-page-dark-btn {
+            margin-top: 20px;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: #f5f5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #555;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .start-page-dark-btn:hover {
+            background: #e8e8e8;
+            border-color: #ccc;
+        }
+        body.dark-mode .start-page-dark-btn {
+            background: #3e3e3e;
+            border-color: #555;
+            color: #ccc;
+        }
+        body.dark-mode .start-page-dark-btn:hover {
+            background: #4e4e4e;
+            border-color: #666;
+        }
+        .start-page-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        .start-page-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: #007acc;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .start-page-btn:hover {
+            background: #005a9e;
+            transform: translateY(-1px);
+        }
+        .start-page-btn:active {
+            transform: translateY(0);
+        }
+        .start-page-btn .btn-icon {
+            font-size: 18px;
+        }
+        .start-page-recent {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+        .recent-header h2 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #2d3436;
+            font-weight: 600;
+        }
+        .recent-action-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .recent-action-btn:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+        .recent-files-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .recent-file-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .recent-file-item:hover {
+            background: #f5f7fa;
+        }
+        .recent-file-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .recent-file-name {
+            font-weight: 500;
+            color: #2d3436;
+            margin-bottom: 2px;
+        }
+        .recent-file-path {
+            font-size: 11px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .recent-file-date {
+            font-size: 11px;
+            color: #888;
+            margin-right: 12px;
+            white-space: nowrap;
+        }
+        .recent-file-remove {
+            opacity: 0;
+            padding: 4px 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: #888;
+            border-radius: 4px;
+            transition: opacity 0.15s, color 0.15s, background 0.15s;
+        }
+        .recent-file-item:hover .recent-file-remove {
+            opacity: 1;
+        }
+        .recent-file-remove:hover {
+            color: #e74c3c;
+            background: rgba(231,76,60,0.1);
+        }
+        .recent-empty {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        .recent-empty p {
+            margin: 0;
+        }
+
+        /* Start Page Styles - Dark Mode */
+        body.dark-mode .start-page {
+            background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+        }
+        body.dark-mode .start-page-banner {
+            background: #2d2d2d;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        body.dark-mode .start-page-title {
+            color: #d4d4d4;
+        }
+        body.dark-mode .start-page-subtitle {
+            color: #888;
+        }
+        body.dark-mode .start-page-btn {
+            background: #0078d4;
+        }
+        body.dark-mode .start-page-btn:hover {
+            background: #106ebe;
+        }
+        body.dark-mode .start-page-recent {
+            background: #2d2d2d;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        body.dark-mode .recent-header {
+            border-bottom-color: #3e3e3e;
+        }
+        body.dark-mode .recent-header h2 {
+            color: #d4d4d4;
+        }
+        body.dark-mode .recent-action-btn {
+            background: #3e3e3e;
+            border-color: #555;
+            color: #ccc;
+        }
+        body.dark-mode .recent-action-btn:hover {
+            background: #4e4e4e;
+            border-color: #666;
+        }
+        body.dark-mode .recent-file-item:hover {
+            background: #3e3e3e;
+        }
+        body.dark-mode .recent-file-name {
+            color: #d4d4d4;
+        }
+        body.dark-mode .recent-file-path,
+        body.dark-mode .recent-file-date {
+            color: #888;
+        }
+        body.dark-mode .recent-file-remove {
+            color: #888;
+        }
+        body.dark-mode .recent-file-remove:hover {
+            color: #e74c3c;
+            background: rgba(231,76,60,0.15);
+        }
+        body.dark-mode .recent-empty {
+            color: #888;
+        }
+
+        /* About Dialog Modal */
+        .about-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        .about-modal-overlay.visible {
+            display: flex;
+        }
+        .about-modal {
+            background: #fff;
+            border-radius: 8px;
+            padding: 30px 40px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .about-modal h1 {
+            margin: 0 0 20px 0;
+            font-size: 24px;
+            color: #333;
+        }
+        .about-modal .credits {
+            margin: 15px 0;
+            line-height: 1.8;
+            color: #555;
+        }
+        .about-modal .credits strong {
+            color: #333;
+        }
+        .about-modal .idea {
+            margin: 15px 0;
+            font-style: italic;
+            color: #666;
+        }
+        .about-modal .website {
+            margin: 20px 0 15px 0;
+        }
+        .about-modal .website a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .about-modal .website a:hover {
+            text-decoration: underline;
+        }
+        .about-modal .close-btn {
+            margin-top: 15px;
+            padding: 8px 24px;
+            background: #0066cc;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .about-modal .close-btn:hover {
+            background: #0055aa;
+        }
+        body.dark-mode .about-modal {
+            background: #2d2d2d;
+        }
+        body.dark-mode .about-modal h1 {
+            color: #e0e0e0;
+        }
+        body.dark-mode .about-modal .credits {
+            color: #bbb;
+        }
+        body.dark-mode .about-modal .credits strong {
+            color: #e0e0e0;
+        }
+        body.dark-mode .about-modal .idea {
+            color: #999;
+        }
+        body.dark-mode .about-modal .website a {
+            color: #5599dd;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Tab bar for multi-file support -->
+        <div class="tab-bar" id="tabBar">
+            <!-- Tabs will be dynamically added here -->
+        </div>
+
+        <!-- Tab context menu -->
+        <div class="tab-context-menu" id="tabContextMenu">
+            <div class="tab-context-menu-item" data-action="close">Close</div>
+            <div class="tab-context-menu-item" data-action="closeOthers">Close Other Tabs</div>
+            <div class="tab-context-menu-item" data-action="closeAll">Close All Tabs</div>
+            <div class="tab-context-menu-separator"></div>
+            <div class="tab-context-menu-item" data-action="save">Save</div>
+            <div class="tab-context-menu-item" data-action="saveAs">Save As...</div>
+            <div class="tab-context-menu-separator"></div>
+            <div class="tab-context-menu-item" data-action="copyPath">Copy Path</div>
+            <div class="tab-context-menu-item" data-action="openFolder">Open Containing Folder</div>
+        </div>
+
+        <!-- Start Page (shown when Start Page tab is active) -->
+        <div class="start-page" id="startPage" style="display: none;">
+            <div class="start-page-content">
+                <div class="start-page-banner">
+                    <h1 class="start-page-title">Clarion Markdown Editor</h1>
+                    <p class="start-page-subtitle">Create and edit Markdown documents with live preview</p>
+                    <button class="start-page-dark-btn" id="darkModeBtn" onclick="toggleDarkMode()" title="Toggle dark mode">🌓 Dark Mode</button>
+                </div>
+                <div class="start-page-actions">
+                    <button class="start-page-btn" onclick="startPageNewFile()">
+                        <span class="btn-icon">+</span>
+                        <span class="btn-text">New File</span>
+                    </button>
+                    <button class="start-page-btn" onclick="startPageOpenFile()">
+                        <span class="btn-icon">&#128194;</span>
+                        <span class="btn-text">Open File</span>
+                    </button>
+                </div>
+                <div class="start-page-recent">
+                    <div class="recent-header">
+                        <h2>Recent Files</h2>
+                        <button class="recent-action-btn" onclick="startPageRemoveMissingFiles()" title="Remove files that no longer exist">Remove Missing</button>
+                    </div>
+                    <div class="recent-files-list" id="recentFilesList"></div>
+                    <div class="recent-empty" id="recentEmpty" style="display: none;"><p>No recent files</p></div>
+                </div>
+            </div>
+        </div>
+
         <div class="format-toolbar">
             <button onclick="insertBold()" title="Bold (Ctrl+B)"><b>B</b></button>
             <button onclick="insertItalic()" title="Italic (Ctrl+I)"><i>I</i></button>
@@ -180,7 +652,7 @@
         <div class="editor-container">
             <div class="editor-pane">
                 <div class="pane-header">MARKDOWN</div>
-                <textarea id="editor" placeholder="Type your markdown here..." oninput="updatePreview()"></textarea>
+                <textarea id="editor" spellcheck="false" placeholder="Type your markdown here..." oninput="debouncedUpdatePreview()"></textarea>
             </div>
             <div class="preview-pane" id="previewPane">
                 <div class="pane-header">
@@ -190,8 +662,8 @@
                             <input type="checkbox" id="syncScrollCheckbox" checked onchange="toggleScrollSync()" style="margin-right: 3px; cursor: pointer;">
                             Sync Scroll
                         </label>
-                        <button class="toggle-btn" id="darkModeBtn" onclick="toggleDarkMode()" title="Toggle dark mode">🌓 Dark</button>
                         <button class="toggle-btn" id="toggleBtn" onclick="toggleFullscreen()" title="Toggle fullscreen preview">Expand</button>
+                        <button class="toggle-btn" id="splitBtn" onclick="toggleSplitDirection()" title="Switch to horizontal split (stacked)">⬌ Vertical</button>
                     </div>
                 </div>
                 <div class="preview-content" id="preview"></div>
@@ -365,6 +837,619 @@
         var formatToolbar = document.querySelector('.format-toolbar');
         var isDirty = false;
         var isFullscreen = false;
+        var isStartPageActive = false;  // Track if Start Page is currently shown
+
+        // ====================================
+        // Tab Management System
+        // ====================================
+        var tabs = {};  // { tabId: { content, isDirty, filePath, fileName } }
+        var activeTabId = null;
+        var contextMenuTabId = null;
+        var tabBar = document.getElementById('tabBar');
+        var tabContextMenu = document.getElementById('tabContextMenu');
+
+        // Find tab by file path
+        function findTabByFilePath(filePath) {
+            for (var id in tabs) {
+                if (tabs[id].filePath === filePath) {
+                    return id;
+                }
+            }
+            return null;
+        }
+
+        // Add a new tab or switch to existing one with same file path
+        function addTab(tabId, fileName, content, filePath) {
+            // Check if a tab with this file path already exists
+            var existingTabId = findTabByFilePath(filePath);
+            if (existingTabId) {
+                switchTab(existingTabId);
+                return existingTabId;
+            }
+
+            // Save current tab content before adding new one
+            if (activeTabId && tabs[activeTabId]) {
+                tabs[activeTabId].content = editor.value;
+            }
+
+            // Create tab data
+            tabs[tabId] = {
+                content: content || '',
+                isDirty: false,
+                filePath: filePath || '',
+                fileName: fileName || 'Untitled'
+            };
+
+            // Create tab element
+            var tabEl = document.createElement('div');
+            tabEl.className = 'tab';
+            tabEl.setAttribute('data-tab-id', tabId);
+            tabEl.innerHTML = '<span class="tab-dirty" style="display:none;">*</span>' +
+                              '<span class="tab-title">' + escapeHtml(fileName) + '</span>' +
+                              '<span class="tab-close" title="Close">&times;</span>';
+
+            // Tab click handler
+            tabEl.addEventListener('click', function(e) {
+                if (e.target.classList.contains('tab-close')) {
+                    // Close button clicked
+                    e.stopPropagation();
+                    notifyCloseTabRequested(tabId);
+                } else {
+                    switchTab(tabId);
+                }
+            });
+
+            // Right-click context menu
+            tabEl.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                showTabContextMenu(tabId, e.clientX, e.clientY);
+            });
+
+            tabBar.appendChild(tabEl);
+
+            // Switch to the new tab
+            switchTab(tabId);
+
+            return tabId;
+        }
+
+        // Switch to a specific tab
+        function switchTab(tabId) {
+            // Handle Start Page tab specially
+            if (tabId === 'startPage') {
+                switchToStartPage();
+                return;
+            }
+
+            // If switching away from Start Page, hide it
+            if (isStartPageActive) {
+                hideStartPage();
+            }
+
+            if (!tabs[tabId]) return;
+
+            // Save current tab content before switching
+            if (activeTabId && tabs[activeTabId] && activeTabId !== tabId && !tabs[activeTabId].isStartPage) {
+                tabs[activeTabId].content = editor.value;
+            }
+
+            // Update active tab visually
+            var allTabs = tabBar.querySelectorAll('.tab');
+            allTabs.forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+            var newActiveTab = tabBar.querySelector('[data-tab-id="' + tabId + '"]');
+            if (newActiveTab) {
+                newActiveTab.classList.add('active');
+                // Scroll tab into view if needed
+                newActiveTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            }
+
+            // Load the tab's content
+            activeTabId = tabId;
+            editor.value = tabs[tabId].content;
+            isDirty = tabs[tabId].isDirty;
+            updatePreview();
+
+            // Notify C#
+            notifyTabSwitched(tabId);
+        }
+
+        // Close a tab
+        function closeTab(tabId) {
+            if (!tabs[tabId]) return;
+
+            // Don't allow closing the Start Page
+            if (tabId === 'startPage') return;
+
+            // Remove tab element
+            var tabEl = tabBar.querySelector('[data-tab-id="' + tabId + '"]');
+            if (tabEl) {
+                tabEl.remove();
+            }
+
+            // Remove tab data
+            delete tabs[tabId];
+
+            // If closing the active tab, switch to another
+            if (activeTabId === tabId) {
+                // Get remaining tabs excluding Start Page
+                var remainingTabIds = Object.keys(tabs).filter(function(id) {
+                    return id !== 'startPage';
+                });
+                if (remainingTabIds.length > 0) {
+                    switchTab(remainingTabIds[remainingTabIds.length - 1]);
+                } else {
+                    // No more file tabs - switch to Start Page
+                    switchToStartPage();
+                }
+            }
+        }
+
+        // Update dirty indicator for a tab
+        function updateTabDirty(tabId, dirty) {
+            if (!tabs[tabId]) return;
+            tabs[tabId].isDirty = dirty;
+
+            var tabEl = tabBar.querySelector('[data-tab-id="' + tabId + '"]');
+            if (tabEl) {
+                var dirtyIndicator = tabEl.querySelector('.tab-dirty');
+                if (dirtyIndicator) {
+                    dirtyIndicator.style.display = dirty ? 'inline' : 'none';
+                }
+            }
+
+            // Update global isDirty if this is active tab
+            if (tabId === activeTabId) {
+                isDirty = dirty;
+            }
+        }
+
+        // Alias for C# compatibility
+        function setTabDirty(tabId, dirty) {
+            updateTabDirty(tabId, dirty);
+        }
+
+        // Get content of the active tab
+        function getActiveTabContent() {
+            if (activeTabId && tabs[activeTabId]) {
+                // Return current editor value (which is the active tab's content)
+                return editor.value();
+            }
+            return '';
+        }
+
+        // Get active tab ID
+        function getActiveTabId() {
+            return activeTabId;
+        }
+
+        // Get tab info
+        function getTabInfo(tabId) {
+            return tabs[tabId] || null;
+        }
+
+        // Get content of a specific tab
+        function getTabContent(tabId) {
+            if (tabId === activeTabId) {
+                // For active tab, return current editor value
+                return editor.value();
+            }
+            if (tabs[tabId]) {
+                return tabs[tabId].content;
+            }
+            return '';
+        }
+
+        // Show tab context menu
+        function showTabContextMenu(tabId, x, y) {
+            contextMenuTabId = tabId;
+            tabContextMenu.style.left = x + 'px';
+            tabContextMenu.style.top = y + 'px';
+            tabContextMenu.classList.add('visible');
+        }
+
+        // Hide tab context menu
+        function hideTabContextMenu() {
+            tabContextMenu.classList.remove('visible');
+            contextMenuTabId = null;
+        }
+
+        // Handle context menu item click
+        function handleContextMenuAction(action) {
+            if (!contextMenuTabId) return;
+
+            var tabId = contextMenuTabId;
+            hideTabContextMenu();
+
+            switch (action) {
+                case 'close':
+                    notifyCloseTabRequested(tabId);
+                    break;
+                case 'closeOthers':
+                    notifyContextMenuAction('CloseOthers', tabId);
+                    break;
+                case 'closeAll':
+                    notifyContextMenuAction('CloseAll', tabId);
+                    break;
+                case 'save':
+                    notifyContextMenuAction('Save', tabId);
+                    break;
+                case 'saveAs':
+                    notifyContextMenuAction('SaveAs', tabId);
+                    break;
+                case 'copyPath':
+                    notifyContextMenuAction('CopyPath', tabId);
+                    break;
+                case 'openFolder':
+                    notifyContextMenuAction('OpenContainingFolder', tabId);
+                    break;
+            }
+        }
+
+        // Context menu click handler
+        tabContextMenu.addEventListener('click', function(e) {
+            var action = e.target.getAttribute('data-action');
+            if (action) {
+                handleContextMenuAction(action);
+            }
+        });
+
+        // Hide context menu when clicking elsewhere and notify C# to close menu dropdowns
+        document.addEventListener('click', function(e) {
+            if (!tabContextMenu.contains(e.target)) {
+                hideTabContextMenu();
+            }
+            notifyDocumentClicked();
+        });
+
+        // Hide context menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideTabContextMenu();
+            }
+        });
+
+        // C# notification helpers
+        function notifyTabSwitched(tabId) {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ type: 'tabSwitched', data: { tabId: tabId } });
+            }
+        }
+
+        function notifyCloseTabRequested(tabId) {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ type: 'closeTabRequested', data: { tabId: tabId } });
+            }
+        }
+
+        function notifyContextMenuAction(action, tabId) {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ type: 'contextMenuAction', data: { action: action, tabId: tabId } });
+            }
+        }
+
+        function notifyDocumentClicked() {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ type: 'documentClicked', data: {} });
+            }
+        }
+
+        // About dialog functions
+        function showAboutDialog() {
+            document.getElementById('aboutModal').classList.add('visible');
+        }
+
+        function hideAboutDialog() {
+            document.getElementById('aboutModal').classList.remove('visible');
+        }
+
+        // Close about dialog when clicking overlay or pressing Escape
+        document.getElementById('aboutModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideAboutDialog();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('aboutModal').classList.contains('visible')) {
+                hideAboutDialog();
+            }
+        });
+
+        // HTML escape helper
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Update tab content without marking as dirty (for loading/saving)
+        function setTabContent(tabId, content) {
+            if (!tabs[tabId]) return;
+            tabs[tabId].content = content;
+            if (tabId === activeTabId) {
+                editor.value = content;
+                // Update preview without triggering dirty
+                preview.innerHTML = marked.parse(content);
+                if (typeof hljs !== 'undefined') {
+                    var blocks = preview.querySelectorAll('pre code');
+                    blocks.forEach(function(block) {
+                        block.removeAttribute('data-highlighted');
+                        try { hljs.highlightElement(block); } catch (err) {}
+                    });
+                }
+                if (typeof mermaid !== 'undefined') {
+                    var mermaidDivs = preview.querySelectorAll('.mermaid');
+                    if (mermaidDivs.length > 0) {
+                        requestAnimationFrame(function() {
+                            try { mermaid.run({ nodes: mermaidDivs }); } catch (err) {}
+                        });
+                    }
+                }
+                updateStats();
+            }
+        }
+
+        // Get all tabs info (for C# to query state)
+        function getAllTabs() {
+            var result = [];
+            for (var id in tabs) {
+                result.push({
+                    tabId: id,
+                    fileName: tabs[id].fileName,
+                    filePath: tabs[id].filePath,
+                    isDirty: tabs[id].isDirty
+                });
+            }
+            return result;
+        }
+
+        // Update tab file info (e.g., after Save As)
+        function updateTabInfo(tabId, fileName, filePath) {
+            if (!tabs[tabId]) return;
+            tabs[tabId].fileName = fileName;
+            tabs[tabId].filePath = filePath;
+
+            // Update tab element
+            var tabEl = tabBar.querySelector('[data-tab-id="' + tabId + '"]');
+            if (tabEl) {
+                var titleEl = tabEl.querySelector('.tab-title');
+                if (titleEl) {
+                    titleEl.textContent = fileName;
+                }
+            }
+        }
+
+        // Expose tab functions to window for C# access
+        window.addTab = addTab;
+        window.switchTab = switchTab;
+        window.switchToTab = switchTab;  // Alias for C# compatibility
+        window.closeTab = closeTab;
+        window.removeTab = closeTab;     // Alias for C# compatibility
+        window.setTabDirty = setTabDirty;
+        window.updateTabDirty = updateTabDirty;
+        window.getActiveTabContent = getActiveTabContent;
+        window.getActiveTabId = getActiveTabId;
+        window.getTabInfo = getTabInfo;
+        window.getTabContent = getTabContent;
+        window.setTabContent = setTabContent;
+        window.getAllTabs = getAllTabs;
+        window.updateTabInfo = updateTabInfo;
+        window.updateTab = updateTabInfo; // Alias for C# compatibility
+
+        // ====================================
+        // End Tab Management System
+        // ====================================
+
+        // ====================================
+        // Start Page System
+        // ====================================
+
+        function initStartPage() {
+            // Called after page load - nothing needed currently
+        }
+
+        function showStartPage() {
+            var startPageEl = document.getElementById('startPage');
+            var editorContainer = document.querySelector('.editor-container');
+            var formatToolbar = document.querySelector('.format-toolbar');
+
+            if (startPageEl && editorContainer) {
+                startPageEl.style.display = 'flex';
+                editorContainer.style.display = 'none';
+                if (formatToolbar) formatToolbar.style.display = 'none';
+                isStartPageActive = true;
+            }
+        }
+
+        function hideStartPage() {
+            var startPageEl = document.getElementById('startPage');
+            var editorContainer = document.querySelector('.editor-container');
+            var formatToolbar = document.querySelector('.format-toolbar');
+
+            if (startPageEl && editorContainer) {
+                startPageEl.style.display = 'none';
+                editorContainer.style.display = 'flex';
+                if (formatToolbar) formatToolbar.style.display = 'flex';
+                isStartPageActive = false;
+            }
+        }
+
+        function addStartPageTab() {
+            // Check if Start Page tab already exists
+            if (tabs['startPage']) {
+                switchToStartPage();
+                return;
+            }
+
+            // Create Start Page tab data
+            tabs['startPage'] = {
+                content: '',
+                isDirty: false,
+                filePath: '',
+                fileName: 'Start Page',
+                isStartPage: true
+            };
+
+            // Create tab element (no close button - Start Page cannot be closed)
+            var tabEl = document.createElement('div');
+            tabEl.className = 'tab';
+            tabEl.setAttribute('data-tab-id', 'startPage');
+            tabEl.innerHTML = '<span class="tab-title">Start Page</span>';
+
+            // Tab click handler
+            tabEl.addEventListener('click', function(e) {
+                switchToStartPage();
+            });
+
+            // Insert at beginning of tab bar
+            var tabBarEl = document.getElementById('tabBar');
+            if (tabBarEl.firstChild) {
+                tabBarEl.insertBefore(tabEl, tabBarEl.firstChild);
+            } else {
+                tabBarEl.appendChild(tabEl);
+            }
+
+            switchToStartPage();
+        }
+
+        function switchToStartPage() {
+            // Save current tab content before switching
+            if (activeTabId && tabs[activeTabId] && !tabs[activeTabId].isStartPage) {
+                tabs[activeTabId].content = editor.value;
+            }
+
+            // Update active tab visually
+            var tabBarEl = document.getElementById('tabBar');
+            var allTabs = tabBarEl.querySelectorAll('.tab');
+            allTabs.forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+            var startPageTab = tabBarEl.querySelector('[data-tab-id="startPage"]');
+            if (startPageTab) {
+                startPageTab.classList.add('active');
+                startPageTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            }
+
+            activeTabId = 'startPage';
+            showStartPage();
+        }
+
+        function populateRecentFiles(recentFiles) {
+            var listEl = document.getElementById('recentFilesList');
+            var emptyEl = document.getElementById('recentEmpty');
+
+            if (!listEl) return;
+
+            listEl.innerHTML = '';
+
+            if (!recentFiles || recentFiles.length === 0) {
+                listEl.style.display = 'none';
+                if (emptyEl) emptyEl.style.display = 'block';
+                return;
+            }
+
+            listEl.style.display = 'flex';
+            if (emptyEl) emptyEl.style.display = 'none';
+
+            recentFiles.forEach(function(file, index) {
+                var itemEl = document.createElement('div');
+                itemEl.className = 'recent-file-item';
+                itemEl.setAttribute('data-file-path', file.path);
+
+                var existsClass = file.exists ? '' : ' style="opacity: 0.5;"';
+
+                itemEl.innerHTML =
+                    '<div class="recent-file-info"' + existsClass + '>' +
+                        '<div class="recent-file-name">' + escapeHtml(file.name) + '</div>' +
+                        '<div class="recent-file-path">' + escapeHtml(file.path) + '</div>' +
+                    '</div>' +
+                    '<div class="recent-file-date">' + escapeHtml(file.modifiedDate || '') + '</div>' +
+                    '<button class="recent-file-remove" title="Remove from list">&times;</button>';
+
+                // Click to open file
+                itemEl.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('recent-file-remove')) {
+                        startPageOpenRecentFile(file.path);
+                    }
+                });
+
+                // Remove button click
+                var removeBtn = itemEl.querySelector('.recent-file-remove');
+                removeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    startPageRemoveRecentFile(index);
+                });
+
+                listEl.appendChild(itemEl);
+            });
+        }
+
+        // Start Page action handlers
+        function startPageNewFile() {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ type: 'startPageAction', data: { action: 'newFile' } });
+            }
+        }
+
+        function startPageOpenFile() {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ type: 'startPageAction', data: { action: 'openFile' } });
+            }
+        }
+
+        function startPageOpenRecentFile(filePath) {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    type: 'startPageAction',
+                    data: { action: 'openRecentFile', filePath: filePath }
+                });
+            }
+        }
+
+        function startPageRemoveRecentFile(index) {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    type: 'startPageAction',
+                    data: { action: 'removeRecentFile', index: index.toString() }
+                });
+            }
+        }
+
+        function startPageRemoveMissingFiles() {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    type: 'startPageAction',
+                    data: { action: 'removeMissingFiles' }
+                });
+            }
+        }
+
+        // Expose Start Page functions to window for C# access
+        window.addStartPageTab = addStartPageTab;
+        window.showStartPage = showStartPage;
+        window.hideStartPage = hideStartPage;
+        window.populateRecentFiles = populateRecentFiles;
+        window.switchToStartPage = switchToStartPage;
+        window.initStartPage = initStartPage;
+        // ====================================
+        // End Start Page System
+        // ====================================
+
+        // Debouncing for preview updates to prevent system lockup
+        var updateTimeout = null;
+        var renderGeneration = 0;
+        var DEBOUNCE_MS = 150;
+
+        function debouncedUpdatePreview() {
+            if (updateTimeout) {
+                clearTimeout(updateTimeout);
+            }
+            updateTimeout = setTimeout(function() {
+                updatePreview();
+            }, DEBOUNCE_MS);
+        }
 
         function toggleFullscreen() {
             isFullscreen = !isFullscreen;
@@ -383,10 +1468,28 @@
             }
         }
 
+        var isHorizontalSplit = false;
+        function toggleSplitDirection() {
+            isHorizontalSplit = !isHorizontalSplit;
+            var editorContainer = document.querySelector('.editor-container');
+            var splitBtn = document.getElementById('splitBtn');
+
+            if (isHorizontalSplit) {
+                editorContainer.classList.add('horizontal-split');
+                splitBtn.textContent = '⬍ Horizontal';
+                splitBtn.title = 'Switch to vertical split (side by side)';
+            } else {
+                editorContainer.classList.remove('horizontal-split');
+                splitBtn.textContent = '⬌ Vertical';
+                splitBtn.title = 'Switch to horizontal split (stacked)';
+            }
+        }
+
         function updatePreview() {
+            var currentGeneration = ++renderGeneration;
             var text = editor.value;
             preview.innerHTML = marked.parse(text);
-            
+
             // Apply syntax highlighting to all code blocks
             var statusMsg = 'Ready';
             if (typeof hljs !== 'undefined') {
@@ -406,25 +1509,47 @@
             } else {
                 statusMsg = 'WARNING: hljs not defined!';
             }
-            
-            // Render Mermaid diagrams
+
+            // Render Mermaid diagrams asynchronously to prevent blocking
             if (typeof mermaid !== 'undefined') {
                 var mermaidDivs = preview.querySelectorAll('.mermaid');
                 if (mermaidDivs.length > 0) {
-                    try {
-                        mermaid.run({
-                            nodes: mermaidDivs
-                        });
-                        statusMsg += ' | ' + mermaidDivs.length + ' diagram(s)';
-                    } catch (err) {
-                        console.error('Mermaid error:', err);
-                    }
+                    var diagramCount = mermaidDivs.length;
+                    // Use requestAnimationFrame to avoid blocking the UI thread
+                    requestAnimationFrame(function() {
+                        // Cancel if a newer render has started
+                        if (currentGeneration !== renderGeneration) return;
+                        try {
+                            mermaid.run({
+                                nodes: mermaidDivs
+                            });
+                        } catch (err) {
+                            console.error('Mermaid error:', err);
+                        }
+                    });
+                    statusMsg += ' | ' + diagramCount + ' diagram(s)';
                 }
             }
-            
+
             setStatus(statusMsg);
             updateStats();
             isDirty = true;
+
+            // Update active tab dirty state and notify C#
+            if (activeTabId && tabs[activeTabId]) {
+                tabs[activeTabId].isDirty = true;
+                var tabEl = tabBar.querySelector('[data-tab-id="' + activeTabId + '"]');
+                if (tabEl) {
+                    var dirtyIndicator = tabEl.querySelector('.tab-dirty');
+                    if (dirtyIndicator) {
+                        dirtyIndicator.style.display = 'inline';
+                    }
+                }
+                // Notify C# about content change
+                if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage({ type: 'contentChanged', tabId: activeTabId });
+                }
+            }
         }
 
         function updateStats() {
@@ -478,13 +1603,13 @@
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             var isDark = document.body.classList.contains('dark-mode');
-            
+
             // Update button text
             var btn = document.getElementById('darkModeBtn');
             if (btn) {
-                btn.textContent = isDark ? '☀️ Light' : '🌓 Dark';
+                btn.textContent = isDark ? '☀️ Light Mode' : '🌓 Dark Mode';
             }
-            
+
             // Notify C# (though we're now handling it in JS)
             if (window.external && window.external.SetDarkMode) {
                 window.external.SetDarkMode(isDark);
@@ -520,12 +1645,37 @@
             return editor.value;
         }
 
-        // Called from C# to load content
+        // Called from C# to load content (legacy - for backward compatibility)
+        // Prefer using addTab for multi-file support
         function loadContent(content, filename) {
             editor.value = content;
             setStatus('Loading: ' + filename);
-            updatePreview();
-            // Status will be updated by updatePreview with highlight status
+
+            // Update preview without marking as dirty (this is a load, not an edit)
+            var text = editor.value;
+            preview.innerHTML = marked.parse(text);
+
+            // Apply syntax highlighting
+            if (typeof hljs !== 'undefined') {
+                var blocks = preview.querySelectorAll('pre code');
+                blocks.forEach(function(block) {
+                    block.removeAttribute('data-highlighted');
+                    try { hljs.highlightElement(block); } catch (err) {}
+                });
+            }
+
+            // Render Mermaid diagrams
+            if (typeof mermaid !== 'undefined') {
+                var mermaidDivs = preview.querySelectorAll('.mermaid');
+                if (mermaidDivs.length > 0) {
+                    requestAnimationFrame(function() {
+                        try { mermaid.run({ nodes: mermaidDivs }); } catch (err) {}
+                    });
+                }
+            }
+
+            updateStats();
+            isDirty = false;
         }
 
         // Called from C# for messages
@@ -618,5 +1768,25 @@
         // Initialize
         updatePreview();
     </script>
+
+    <!-- About Dialog Modal -->
+    <div class="about-modal-overlay" id="aboutModal">
+        <div class="about-modal">
+            <h1>Markdown Editor</h1>
+            <div class="credits">
+                <strong>Written by</strong><br>
+                John Hickey<br>
+                Mark Sarson<br>
+                Claude Code
+            </div>
+            <div class="idea">
+                From an idea by Dinko Bacon
+            </div>
+            <div class="website">
+                <a href="https://www.clarionlive.com" target="_blank">www.clarionlive.com</a>
+            </div>
+            <button class="close-btn" onclick="hideAboutDialog()">Close</button>
+        </div>
+    </div>
 </body>
 </html>
