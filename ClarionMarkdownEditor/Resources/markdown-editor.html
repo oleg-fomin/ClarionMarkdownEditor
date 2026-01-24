@@ -219,21 +219,30 @@
                 var out = '';
                 var lines = src.split('\n');
                 var inCode = false, inList = false, listType = '';
-                var codeBlock = '', codeLanguage = '';
+                var codeBlock = '', codeLanguage = '', codeFence = '';
 
                 for (var i = 0; i < lines.length; i++) {
                     var line = lines[i];
 
-                    // Fenced code blocks
-                    if (line.match(/^```(\w*)/)) {
+                    // Fenced code blocks (support 3+ backticks at any indentation)
+                    var codeMatch = line.match(/^(\s*)(```+)(\w*)/);
+                    if (codeMatch) {
+                        var fence = codeMatch[2]; // Get the backticks (```, ````, etc.)
                         if (!inCode) {
                             inCode = true;
-                            codeLanguage = line.replace(/^```/, '').trim();
+                            codeFence = fence; // Remember how many backticks opened it
+                            codeLanguage = codeMatch[3]; // Get language from match
                             codeBlock = '';
-                        } else {
+                        } else if (fence === codeFence) {
+                            // Only close if same number of backticks
                             out += '<pre><code class="' + (codeLanguage ? 'language-' + codeLanguage : '') + '">' + escape(codeBlock.slice(0,-1)) + '</code></pre>\n';
                             inCode = false;
                             codeBlock = '';
+                            codeLanguage = '';
+                            codeFence = '';
+                        } else {
+                            // Different number of backticks - treat as content
+                            codeBlock += line + '\n';
                         }
                         continue;
                     }
