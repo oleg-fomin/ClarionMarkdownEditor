@@ -6,13 +6,11 @@
     <Import assembly="ClarionMarkdownEditor.dll"/>
   </Runtime>
   <Path name="/SharpDevelop/Workbench/Pads">
-    <Pad id="MarkdownEditor" category="Tools" title="Markdown Editor"
+    <Pad id="MarkdownEditor" category="Tools" title="Markdown Editor (Pad)"
          icon="PadIcons.ClassBrowser" shortcut="Control|Alt|M"
          class="ClarionMarkdownEditor.MarkdownEditorPad"/>
   </Path>
-  <Path name="/SharpDevelop/Workbench/MainMenu/Tools">
-    <MenuItem id="ShowMarkdownEditor" label="Markdown Editor (Pad)"
-              class="ClarionMarkdownEditor.ShowMarkdownEditorCommand"/>
+  <Path name="/SharpDevelop/Workbench/MainMenu/View/Tools">
     <MenuItem id="ShowMarkdownEditorWindow" label="Markdown Editor (Window)"
               class="ClarionMarkdownEditor.ShowMarkdownEditorWindowCommand"/>
   </Path>
