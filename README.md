@@ -404,7 +404,7 @@ MIT License - see LICENSE file for details.
 - **Oleg Fomin** - Document window mode feature
 - **Claude Code** - AI pair programming assistant
 
-From an idea by **Dinko Bacon**
+From an idea by **Dinko Bakun**
 
 ## Acknowledgments
 
