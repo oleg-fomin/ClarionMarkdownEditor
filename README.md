@@ -258,8 +258,17 @@ A modern Markdown file viewer and editor addin for the Clarion IDE. Features a s
 
 ### Opening the Editor
 
+The Markdown Editor can be opened in two different modes:
+
+#### Dockable Pad Mode (Default)
 - **Keyboard**: Press `Ctrl+Alt+M`
-- **Menu**: Go to `Tools → Markdown Editor`
+- **Menu**: Go to `Tools → Markdown Editor (Pad)`
+- Opens as a dockable tool window that can be positioned on any side of the IDE
+
+#### Document Window Mode
+- **Menu**: Go to `Tools → Markdown Editor (Window)`
+- Opens in the main document area alongside your source code files
+- Useful when you want to work on markdown files like regular documents
 
 ### Editing Markdown
 
@@ -309,9 +318,11 @@ MarkDownAddin/
     ├── Properties/
     │   └── AssemblyInfo.cs
     ├── MarkdownEditorPad.cs             # Dockable pad container
+    ├── MarkdownEditorViewContent.cs     # Document window container
     ├── MarkdownEditorControl.cs         # Main control with WebBrowser
     ├── MarkdownEditorControl.Designer.cs
-    ├── ShowMarkdownEditorCommand.cs     # Tools menu command
+    ├── ShowMarkdownEditorCommand.cs     # Tools menu command (Pad mode)
+    ├── ShowMarkdownEditorWindowCommand.cs # Tools menu command (Window mode)
     ├── Services/
     │   ├── EditorService.cs             # IDE editor interaction
     │   ├── SettingsService.cs           # User settings persistence
@@ -390,6 +401,7 @@ MIT License - see LICENSE file for details.
 
 - **John Hickey** - Original author
 - **Mark Sarson** - WebView2 enhancements, Mermaid support
+- **Oleg Fomin** - Document window mode feature
 - **Claude Code** - AI pair programming assistant
 
 From an idea by **Dinko Bacon**

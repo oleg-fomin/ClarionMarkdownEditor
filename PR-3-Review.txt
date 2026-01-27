@@ -1,0 +1,61 @@
+PR #3 Review - Add menu option to open the editor as a document view
+====================================================================
+Author: oleg-fomin
+Date Reviewed: 2026-01-27
+Status: APPROVED
+
+Summary
+-------
+This PR adds the ability to open the Markdown Editor as a document view in the
+main area (like source code files) instead of only as a dockable side pad.
+
+Files Changed
+-------------
+1. ClarionMarkdownEditor.addin
+   - Renames existing menu item to "Markdown Editor (Pad)"
+   - Adds new menu item "Markdown Editor (Window)"
+
+2. ClarionMarkdownEditor.csproj
+   - Includes new source files in compilation
+
+3. MarkdownEditorViewContent.cs (NEW - 137 lines)
+   - ViewContent class inheriting from AbstractViewContent
+   - Allows editor to be displayed in the main document area
+   - Implements Control, IsDirty, FileName properties
+   - Implements Load, Save, Dispose, RedrawContent methods
+
+4. ShowMarkdownEditorWindowCommand.cs (NEW - 58 lines)
+   - Command to show editor as a main window
+   - Uses reflection to call ShowView method for IDE compatibility
+   - Includes fallback approach via ViewContentCollection
+   - Proper error handling with user feedback
+
+Code Quality Assessment
+-----------------------
+POSITIVES:
++ Well-documented with XML comments
++ Follows existing patterns (mirrors MarkdownEditorPad and ShowMarkdownEditorCommand)
++ Proper error handling with try-catch and user feedback
++ Uses reflection for SharpDevelop API compatibility (consistent with existing code)
++ RefreshContent() method called by RedrawContent() exists in MarkdownEditorControl
+
+MINOR NOTES:
+- Save() and Load() methods only update properties, not actual file content
+  (acceptable since MarkdownEditorControl handles file I/O internally)
+- Small whitespace changes in csproj (removed trailing blank lines)
+- RedrawContent() calls RefreshContent() which reloads file from disk,
+  slightly different from existing pad which calls Refresh()
+
+Security Review
+---------------
+No security concerns identified. The code does not:
+- Execute arbitrary commands
+- Access network resources
+- Handle sensitive data unsafely
+- Introduce injection vulnerabilities
+
+Verdict
+-------
+APPROVED - This PR is safe to accept. The code is well-structured, follows
+existing patterns, and adds a useful feature giving users two options for
+how to use the editor (dockable pad vs main document window).
