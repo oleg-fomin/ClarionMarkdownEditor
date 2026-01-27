@@ -10,7 +10,7 @@
          icon="PadIcons.ClassBrowser" shortcut="Control|Alt|M"
          class="ClarionMarkdownEditor.MarkdownEditorPad"/>
   </Path>
-  <Path name="/Workspace/Tools">
+  <Path name="/SharpDevelop/Workbench/MainMenu/Tools">
     <MenuItem id="ShowMarkdownEditor" label="Markdown Editor (Pad)"
               class="ClarionMarkdownEditor.ShowMarkdownEditorCommand"/>
     <MenuItem id="ShowMarkdownEditorWindow" label="Markdown Editor (Window)"
