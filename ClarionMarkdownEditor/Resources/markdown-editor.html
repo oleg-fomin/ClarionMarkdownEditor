@@ -1145,14 +1145,18 @@
         }
 
         // Close about dialog when clicking overlay or pressing Escape
-        document.getElementById('aboutModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideAboutDialog();
-            }
-        });
+        var aboutModalEl = document.getElementById('aboutModal');
+        if (aboutModalEl) {
+            aboutModalEl.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideAboutDialog();
+                }
+            });
+        }
 
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && document.getElementById('aboutModal').classList.contains('visible')) {
+            var modal = document.getElementById('aboutModal');
+            if (e.key === 'Escape' && modal && modal.classList.contains('visible')) {
                 hideAboutDialog();
             }
         });
@@ -1565,12 +1569,12 @@
         
         function syncScroll(source, target) {
             if (syncingScroll || !scrollSyncEnabled) return;
-            
+
             syncingScroll = true;
             var percentage = source.scrollTop / (source.scrollHeight - source.clientHeight);
             if (isNaN(percentage)) percentage = 0;
             target.scrollTop = percentage * (target.scrollHeight - target.clientHeight);
-            
+
             setTimeout(function() {
                 syncingScroll = false;
             }, 10);
@@ -1586,19 +1590,23 @@
             }
         }
         
-        // Sync editor scroll to preview
-        editor.addEventListener('scroll', function() {
-            if (scrollSyncEnabled) {
-                syncScroll(editor, preview);
+        // Sync scroll handlers - must be set after page load (WebView2 timing issue)
+        setTimeout(function() {
+            if (editor) {
+                editor.onscroll = function() {
+                    if (scrollSyncEnabled) {
+                        syncScroll(editor, preview);
+                    }
+                };
             }
-        });
-        
-        // Sync preview scroll to editor
-        preview.addEventListener('scroll', function() {
-            if (scrollSyncEnabled) {
-                syncScroll(preview, editor);
+            if (preview) {
+                preview.onscroll = function() {
+                    if (scrollSyncEnabled) {
+                        syncScroll(preview, editor);
+                    }
+                };
             }
-        });
+        }, 500);
         
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
