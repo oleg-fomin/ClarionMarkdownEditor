@@ -45,6 +45,7 @@ namespace ClarionMarkdownEditor
         private string _currentFilePath;
         private string _tempHtmlPath;
         private bool _isWebView2Ready = false;
+        private bool _initializationStarted = false;
 
         // Tab tracking fields
         private Dictionary<string, FileTab> _openTabs = new Dictionary<string, FileTab>();
@@ -67,7 +68,30 @@ namespace ClarionMarkdownEditor
             // Close menu dropdowns when WebView2 gets focus (clicks inside WebView2 don't bubble up to close menus)
             webView.GotFocus += (s, e) => CloseMenuDropdowns();
 
-            InitializeWebView();
+            // Defer WebView2 initialization until the webView control has its handle
+            // (not just the parent UserControl - the WebView2 itself needs a valid HWND)
+            webView.HandleCreated += WebView_HandleCreated;
+
+            // If webView handle is already created (restored from docked state), initialize
+            if (webView.IsHandleCreated)
+            {
+                _initializationStarted = true;
+                // Use BeginInvoke to defer initialization until after the control
+                // is fully integrated and the message queue settles
+                this.BeginInvoke(new Action(() => InitializeWebView()));
+            }
+        }
+
+        private void WebView_HandleCreated(object sender, EventArgs e)
+        {
+            // Only initialize once
+            if (!_initializationStarted)
+            {
+                _initializationStarted = true;
+                // Use BeginInvoke to defer initialization until after the control
+                // is fully integrated and the message queue settles
+                this.BeginInvoke(new Action(() => InitializeWebView()));
+            }
         }
 
         private void CloseMenuDropdowns()
@@ -83,27 +107,19 @@ namespace ClarionMarkdownEditor
 
         private async void InitializeWebView()
         {
+            // Prevent double initialization
+            if (_initializationStarted && _isWebView2Ready)
+            {
+                return;
+            }
+            _initializationStarted = true;
+
             try
             {
                 System.Diagnostics.Debug.WriteLine("=== InitializeWebView START ===");
-                
-                // Check if WebView2 Runtime is available
-                string runtimeVersion = null;
-                try
-                {
-                    runtimeVersion = Microsoft.Web.WebView2.Core.CoreWebView2Environment.GetAvailableBrowserVersionString();
-                    System.Diagnostics.Debug.WriteLine($"WebView2 Runtime version: {runtimeVersion}");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"WebView2 Runtime check failed: {ex.Message}");
-                    // Runtime not found
-                    ShowWebView2InstallPrompt();
-                    return;
-                }
 
+                // Initialize WebView2 directly - let EnsureCoreWebView2Async handle any errors
                 System.Diagnostics.Debug.WriteLine("About to call EnsureCoreWebView2Async...");
-                // Initialize WebView2
                 await webView.EnsureCoreWebView2Async(null);
                 _isWebView2Ready = true;
                 System.Diagnostics.Debug.WriteLine("WebView2 initialized successfully!");
